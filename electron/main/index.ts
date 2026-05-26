@@ -186,10 +186,17 @@ async function createWindow() {
     // set initial theme mode
     nativeTheme.themeSource = CONFIG.get("theme")
 
+    const isRaycast = nativeTheme.themeSource === 'raycast'
+    const isDark = nativeTheme.shouldUseDarkColors || isRaycast // assuming raycast is darkish by default
+
     win = new BrowserWindow(Object.assign({
         title: 'heynote',
         icon,
-        backgroundColor: nativeTheme.shouldUseDarkColors ? '#262B37' : '#FFFFFF',
+        backgroundColor: isRaycast ? '#00000000' : (isDark ? '#262B37' : '#FFFFFF'),
+        transparent: isRaycast,
+        vibrancy: isRaycast ? 'under-window' : undefined,
+        visualEffectState: isRaycast ? 'active' : undefined,
+        backgroundMaterial: isRaycast ? 'acrylic' : 'none',
         accentColor: undefined,
         show: !hideOnStartup,
         // We can't set fullscreen:true when hideOnStartup is true, because it will cancel out the show:false option
@@ -536,6 +543,18 @@ app.on('activate', () => {
 ipcMain.handle('dark-mode:set', (event, mode) => {
     CONFIG.set("theme", mode)
     nativeTheme.themeSource = mode
+
+    const isRaycast = mode === 'raycast'
+    const isDark = nativeTheme.shouldUseDarkColors || isRaycast
+    if (win) {
+        // Can't dynamically change vibrancy in Electron cleanly without recreate, but we can set background material or color
+        win.setBackgroundColor(isRaycast ? '#00000000' : (isDark ? '#262B37' : '#FFFFFF'));
+        if (isMac) {
+            win.setVibrancy(isRaycast ? 'under-window' : null)
+        } else if (isWindows) {
+            win.setBackgroundMaterial(isRaycast ? 'acrylic' : 'none')
+        }
+    }
 
     // update titleBarOverlay colors on Windows/Linux
     if (!isMac) {
