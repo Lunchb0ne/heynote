@@ -244,6 +244,61 @@ const preventFirstBlockFromBeingDeleted = EditorState.changeFilter.of((tr) => {
 })
 
 /**
+ * Protect block delimiters and ensure blocks always have minimum content.
+ * This is especially important for VIM mode where operations like 'dd'
+ * could expose or delete block delimiters, breaking the editor experience.
+ */
+const protectBlockDelimiters = EditorState.changeFilter.of((tr) => {
+    // Skip protection for internal Heynote operations
+    if (tr.annotations.some(a => a.type === heynoteEvent)) {
+        return tr
+    }
+
+    const protect = []
+    const blocks = tr.startState.field(blockState)
+
+    // Check each change in the transaction
+    tr.changes.iterChanges((fromA, toA, fromB, toB, inserted) => {
+        const insertedText = inserted.sliceString(0)
+
+        // Check if this change affects any block delimiter
+        blocks.forEach(block => {
+            const delimiterStart = block.delimiter.from
+            const delimiterEnd = block.delimiter.to
+            const contentStart = block.content.from
+            const contentEnd = block.content.to
+
+            // Protect the delimiter itself from any direct modification
+            if (fromA < delimiterEnd && toA > delimiterStart) {
+                // Change overlaps with delimiter - protect it
+                protect.push(delimiterStart, delimiterEnd)
+            }
+
+            // Prevent deletion that would leave a block completely empty
+            // This handles the VIM 'dd' case on single-line blocks
+            if (contentStart < contentEnd) {
+                // Check if the change would delete all content
+                const changeDeletesAllContent = (fromA <= contentStart && toA >= contentEnd)
+                const isNetDeletion = insertedText.length === 0
+
+                if (changeDeletesAllContent && isNetDeletion) {
+                    // Protect the last newline in the block to keep it non-empty
+                    // This prevents the block delimiter from being exposed
+                    const lastChar = contentEnd - 1
+                    if (lastChar >= contentStart) {
+                        protect.push(lastChar, contentEnd)
+                    }
+                }
+            }
+        })
+    })
+
+    if (protect.length > 0) {
+        return protect
+    }
+})
+
+/**
  * Transaction filter to prevent the selection from being before the first block
   */
 const preventSelectionBeforeFirstBlock = EditorState.transactionFilter.of((tr) => {
@@ -447,6 +502,7 @@ export const noteBlockExtension = (editor) => {
         atomicNoteBlock,
         blockLayer,
         preventFirstBlockFromBeingDeleted,
+        protectBlockDelimiters,
         preventSelectionBeforeFirstBlock,
         emitCursorChange(editor),
         updateCreatedOnEmptyBlock(),
