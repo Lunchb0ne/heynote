@@ -34,7 +34,7 @@ const schema = {
     settings: {
         type: "object",
         properties: {
-            "keymap": { "enum": ["default", "emacs"], default:"default" },
+            "keymap": { "enum": ["default", "emacs", "vim"], default:"default" },
             "emacsMetaKey": { "enum": [null, "alt", "meta"], default: null },
             "keyBindings": {
                 "type": "array",
@@ -114,7 +114,7 @@ const schema = {
         },
     },
 
-    theme: {type: "string", default: "system"},
+    theme: {type: "string", enum: ["system", "light", "dark", "blur"], default: "system"},
 
     openTabsState: {
         type: "object",

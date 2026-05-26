@@ -34,6 +34,7 @@
                 keymaps: [
                     { name: "Default", value: "default" },
                     { name: "Emacs", value: "emacs" },
+                    { name: "Vim", value: "vim" },
                 ],
                 keymap: this.initialSettings.keymap,
                 keyBindings: this.initialSettings.keyBindings || [],
@@ -377,6 +378,7 @@
                                     <option :selected="theme === 'system'" value="system">System</option>
                                     <option :selected="theme === 'light'" value="light">Light</option>
                                     <option :selected="theme === 'dark'" value="dark">Dark</option>
+                                    <option :selected="theme === 'blur'" value="blur">Blur</option>
                                 </select>
                             </div>
                         </div>

@@ -28,6 +28,17 @@
     --tab-active-bg-blurred: #1b2b36
     --window-border-color: #000
     --draw-element-handle-color: #007bff
+
+:root[theme='blur']
+    --status-bar-background: rgba(14, 18, 23, 0.9)
+    --status-bar-color: rgba(255, 255, 255, 0.75)
+    --highlight-color: #1b6540
+    --panel-background: rgba(21, 21, 22, 0.9)
+    --tab-bar-border-bottom-color: rgba(22, 22, 22, 0.8)
+    --tab-active-bg: rgba(33, 54, 68, 0.6)
+    --tab-active-bg-blurred: rgba(27, 43, 54, 0.5)
+    --window-border-color: #000
+    --draw-element-handle-color: #007bff
     
 html
     margin: 0
@@ -49,6 +60,8 @@ body
     overscroll-behavior-y: none
     +dark-mode
         background: #252B37
+    &[theme='blur']
+        background: transparent
 
 input, button
     font-family: "Open Sans"

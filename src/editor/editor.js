@@ -6,6 +6,7 @@ import { undo, redo } from "@codemirror/commands"
 
 import { heynoteLight } from "./theme/light.js"
 import { heynoteDark } from "./theme/dark.js"
+import { heynoteBlur } from "./theme/blur.js"
 import { heynoteBase } from "./theme/base.js"
 import { getFontTheme } from "./theme/font-theme.js";
 import { customSetup } from "./setup.js"
@@ -107,8 +108,8 @@ export class HeynoteEditor {
                 this.closeBracketsCompartment.of(bracketClosing ? [getCloseBracketsExtensions()] : []),
 
                 this.readOnlyCompartment.of([]),
-                
-                this.themeCompartment.of(theme === "dark" ? heynoteDark : heynoteLight),
+
+                this.themeCompartment.of(theme === "dark" ? heynoteDark : (theme === "blur" ? heynoteBlur : heynoteLight)),
                 heynoteBase,
                 this.fontTheme.of(getFontTheme(fontFamily, fontSize)),
                 this.indentUnitCompartment.of(indentation(indentType, tabSize)),
@@ -333,8 +334,12 @@ export class HeynoteEditor {
 
     setTheme(theme) {
         this.view.dispatch({
-            effects: this.themeCompartment.reconfigure(theme === "dark" ? heynoteDark : heynoteLight),
+            effects: this.themeCompartment.reconfigure(theme === "dark" ? heynoteDark : (theme === "blur" ? heynoteBlur : heynoteLight)),
         })
+        // Notify the main process about the theme change for potential window effects
+        if (window.heynote.setTheme) {
+            window.heynote.setTheme(theme)
+        }
     }
 
     setKeymap(keymap, emacsMetaKey, keyBindings) {

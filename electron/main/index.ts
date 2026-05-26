@@ -184,12 +184,20 @@ async function createWindow() {
     )
 
     // set initial theme mode
-    nativeTheme.themeSource = CONFIG.get("theme")
+    const currentTheme = CONFIG.get("theme") as string
+    const effectiveMode = currentTheme === "blur" ? "dark" : currentTheme
+    nativeTheme.themeSource = effectiveMode
+
+    // Determine background color and vibrancy settings
+    const isBlurTheme = currentTheme === "blur"
+    const backgroundColor = isBlurTheme && isMac ? '#00000000' : (nativeTheme.shouldUseDarkColors ? '#262B37' : '#FFFFFF')
+    const vibrancyEffect = isBlurTheme && isMac ? 'under-window' : undefined
 
     win = new BrowserWindow(Object.assign({
         title: 'heynote',
         icon,
-        backgroundColor: nativeTheme.shouldUseDarkColors ? '#262B37' : '#FFFFFF',
+        backgroundColor: backgroundColor,
+        ...(vibrancyEffect && isMac ? { vibrancy: vibrancyEffect } : {}),
         accentColor: undefined,
         show: !hideOnStartup,
         // We can't set fullscreen:true when hideOnStartup is true, because it will cancel out the show:false option
@@ -210,9 +218,9 @@ async function createWindow() {
         trafficLightPosition: { x: 8, y: 8 },
         ...(!isMac ? {
             titleBarOverlay: {
-                color: nativeTheme.shouldUseDarkColors ? TITLE_BAR_BG_DARK : TITLE_BAR_BG_LIGHT,
-                symbolColor: nativeTheme.shouldUseDarkColors ? '#aaa' : '#333',
-            }, 
+                color: (isBlurTheme || nativeTheme.shouldUseDarkColors) ? TITLE_BAR_BG_DARK : TITLE_BAR_BG_LIGHT,
+                symbolColor: (isBlurTheme || nativeTheme.shouldUseDarkColors) ? '#aaa' : '#333',
+            },
         } : {})
     }, windowBounds))
 
@@ -535,13 +543,28 @@ app.on('activate', () => {
 
 ipcMain.handle('dark-mode:set', (event, mode) => {
     CONFIG.set("theme", mode)
-    nativeTheme.themeSource = mode
+
+    // For blur theme, use dark mode as base
+    const effectiveMode = mode === "blur" ? "dark" : mode
+    nativeTheme.themeSource = effectiveMode
+
+    // Handle window vibrancy for blur theme on macOS
+    if (isMac && mode === "blur") {
+        // Set vibrancy effect for blur theme
+        win?.setVibrancy('under-window')
+        win?.setBackgroundColor('#00000000') // Transparent background
+    } else if (isMac) {
+        // Remove vibrancy for other themes
+        win?.setVibrancy(null)
+        win?.setBackgroundColor(nativeTheme.shouldUseDarkColors ? '#262B37' : '#FFFFFF')
+    }
 
     // update titleBarOverlay colors on Windows/Linux
     if (!isMac) {
+        const isDark = mode === "blur" || nativeTheme.shouldUseDarkColors
         win?.setTitleBarOverlay({
-            color: nativeTheme.shouldUseDarkColors ? TITLE_BAR_BG_DARK : TITLE_BAR_BG_LIGHT,
-            symbolColor: nativeTheme.shouldUseDarkColors ? '#aaa' : '#333',
+            color: isDark ? TITLE_BAR_BG_DARK : TITLE_BAR_BG_LIGHT,
+            symbolColor: isDark ? '#aaa' : '#333',
         })
     }
 })

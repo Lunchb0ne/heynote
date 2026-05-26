@@ -1,5 +1,6 @@
 import { keymap } from "@codemirror/view"
 import { Prec } from "@codemirror/state"
+import { vim } from "@replit/codemirror-vim"
 
 import { keyName } from "w3c-keyname"
 
@@ -226,7 +227,37 @@ function getCombinedKeymapSpec(keymapName, userKeymap) {
     ]
 }
 
+export const VIM_KEYMAP = [
+    // Allow Heynote commands to work in VIM mode
+    cmd("Mod-Enter", "addNewBlockAfterCurrent"),
+    cmd("Mod-Shift-Enter", "addNewBlockAfterLastAndScrollDown"),
+    cmd("Alt-Enter", "addNewBlockBeforeCurrent"),
+    cmd("Alt-Shift-Enter", "addNewBlockBeforeFirst"),
+    cmd("Mod-Alt-Enter", "insertNewBlockAtCursor"),
+    cmd("Mod-l", "openLanguageSelector"),
+    cmd("Mod-p", "openBufferSelector"),
+    cmd("Mod-Shift-p", "openCommandPalette"),
+    cmd("Mod-s", "openMoveToBuffer"),
+    cmd("Mod-n", "openCreateNewBuffer"),
+    cmd("Alt-Shift-f", "formatBlockContent"),
+    cmd("Mod-Shift-Space", "toggleCheckbox"),
+    cmd("Mod-Shift-d", "deleteBlock"),
+    cmd("Mod-w", "closeCurrentTab"),
+    cmd("Mod-Shift-t", "reopenLastClosedTab"),
+    cmd("Ctrl-Tab", "nextTab"),
+    cmd("Ctrl-Shift-Tab", "previousTab"),
+    cmd("Mod-Shift-s", "toggleLeftPanel"),
+    cmd("Mod-Shift-e", "openBufferExplorer"),
+    cmd("Mod-Shift-f", "openLibrarySearch"),
+]
+
 export function getKeymapExtensions(editor, keymap, keyBindings) {
+    if (keymap === "vim") {
+        return [
+            vim(),
+            keymapFromSpec(getCombinedKeymapSpec("default", [...VIM_KEYMAP, ...(keyBindings || [])]), editor),
+        ]
+    }
     return [
         keymapFromSpec(getCombinedKeymapSpec(keymap, keyBindings), editor)
     ]
