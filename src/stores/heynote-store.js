@@ -56,9 +56,14 @@ export const useHeynoteStore = defineStore("heynote", {
         isFullscreen: false,
         isFocused: true,
         systemLocale: navigator.language,
+        vimMode: "normal",
     }),
 
     actions: {
+        setVimMode(mode) {
+            this.vimMode = mode
+        },
+
         async updateBuffers() {
             this.setBuffers(await window.heynote.buffer.getList())
         },

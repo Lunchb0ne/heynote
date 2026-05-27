@@ -34,8 +34,15 @@ const schema = {
     settings: {
         type: "object",
         properties: {
-            "keymap": { "enum": ["default", "emacs"], default:"default" },
+            "keymap": { "enum": ["default", "emacs", "vim"], default:"default" },
             "emacsMetaKey": { "enum": [null, "alt", "meta"], default: null },
+            "vim": {
+                "type": "object",
+                "properties": {
+                    "relativeLineNumbers": { "type": "boolean", "default": false },
+                },
+                "additionalProperties": false,
+            },
             "keyBindings": {
                 "type": "array",
                 "items": {

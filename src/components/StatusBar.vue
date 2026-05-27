@@ -35,12 +35,13 @@
             ...mapState(useHeynoteStore, [
                 "currentBufferName",
                 "currentCursorLine",
-                "currentLanguage", 
-                "currentSelectionSize", 
+                "currentLanguage",
+                "currentSelectionSize",
                 "currentLanguage",
                 "currentLanguageAuto",
                 "currentCreatedTime",
                 "systemLocale",
+                "vimMode",
             ]),
             ...mapState(useSettingsStore, [
                 "spellcheckEnabled",
@@ -51,6 +52,14 @@
 
             languageName() {
                 return LANGUAGE_NAMES[this.currentLanguage] || this.currentLanguage
+            },
+
+            isVimMode() {
+                return this.settings.keymap === "vim"
+            },
+
+            vimModeLabel() {
+                return `--${(this.vimMode || "normal").toUpperCase()}--`
             },
 
             className() {
@@ -113,6 +122,7 @@
         >
             <span class="icon icon-format"></span>
         </div>
+        <div v-if="isVimMode" class="status-block vim-mode">{{ vimModeLabel }}</div>
         <div class="status-block line-number">
             Ln <span class="num">{{ currentCursorLine?.line }}</span>
             Col <span class="num">{{ currentCursorLine?.col }}</span>
@@ -225,6 +235,13 @@
                 height: 22px
                 +dark-mode
                     opacity: 0.9
+        .vim-mode
+            font-family: monospace
+            font-weight: bold
+            color: rgba(255, 255, 255, 0.9)
+            letter-spacing: 0.03em
+            +dark-mode
+                color: rgba(255, 255, 255, 0.75)
         .line-number
             color: rgba(255, 255, 255, 0.7)
             .num

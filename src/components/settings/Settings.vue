@@ -34,10 +34,12 @@
                 keymaps: [
                     { name: "Default", value: "default" },
                     { name: "Emacs", value: "emacs" },
+                    { name: "Vim", value: "vim" },
                 ],
                 keymap: this.initialSettings.keymap,
                 keyBindings: this.initialSettings.keyBindings || [],
                 metaKey: this.initialSettings.emacsMetaKey,
+                vimRelativeLineNumbers: this.initialSettings.vim?.relativeLineNumbers ?? false,
                 isMac: window.heynote.platform.isMac,
                 isLinux: window.heynote.platform.isLinux,
                 showLineNumberGutter: this.initialSettings.showLineNumberGutter,
@@ -135,6 +137,7 @@
                     keymap: this.keymap,
                     keyBindings: this.keyBindings.map((kb) => toRaw(kb)),
                     emacsMetaKey: window.heynote.platform.isMac ? this.metaKey : "alt",
+                    vim: { relativeLineNumbers: this.vimRelativeLineNumbers },
                     allowBetaVersions: this.allowBetaVersions,
                     enableGlobalHotkey: this.enableGlobalHotkey,
                     globalHotkey: this.globalHotkey,
@@ -512,6 +515,19 @@
                                     <option :selected="metaKey === 'meta'" value="meta">Command</option>
                                     <option :selected="metaKey === 'alt'" value="alt">Option</option>
                                 </select>
+                            </div>
+                        </div>
+                        <div class="row" v-if="keymap === 'vim'">
+                            <div class="entry">
+                                <h2>Vim Settings</h2>
+                                <label>
+                                    <input
+                                        type="checkbox"
+                                        v-model="vimRelativeLineNumbers"
+                                        @change="updateSettings"
+                                    />
+                                    Relative line numbers
+                                </label>
                             </div>
                         </div>
                         <KeyboardBindings 

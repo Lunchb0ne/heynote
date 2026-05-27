@@ -16,7 +16,7 @@ import { heynoteEvent, SET_CONTENT, DELETE_BLOCK, APPEND_BLOCK, SET_FONT } from 
 import { getBlockDelimiter } from "./block/block-parsing.js"
 import { changeCurrentBlockLanguage, triggerCurrenciesLoaded, deleteBlock, selectAll } from "./block/commands.js"
 import { formatBlockContent } from "./block/format-code.js"
-import { getKeymapExtensions } from "./keymap.js"
+import { getKeymapExtensions, getVimExtensions } from "./keymap.js"
 import { heynoteCopyCut } from "./clipboard/copy-paste.js"
 import { heynoteDropPaste } from "./clipboard/drag-drop.js"
 import { languageDetection } from "./language-detection/autodetect.js"
@@ -82,6 +82,9 @@ export class HeynoteEditor {
         this.cursorBlinkCompartment = new Compartment
         this.deselectOnCopy = keymap === "emacs"
         this.emacsMetaKey = emacsMetaKey
+        this.vimCompartment = new Compartment
+        this._vimMode = "normal"
+        this.onVimModeChange = null
         this.fontTheme = new Compartment
         this.spellcheckEnabled = spellcheckEnabled
         this.spellcheckCompartment = new Compartment
@@ -96,6 +99,7 @@ export class HeynoteEditor {
         const state = EditorState.create({
             doc: "",
             extensions: [
+                this.vimCompartment.of(keymap === "vim" ? getVimExtensions(this) : []),
                 this.keymapCompartment.of(getKeymapExtensions(this, keymap, keyBindings)),
                 heynoteCopyCut(this),
                 heynoteDropPaste(),
@@ -341,7 +345,10 @@ export class HeynoteEditor {
         this.deselectOnCopy = keymap === "emacs"
         this.emacsMetaKey = emacsMetaKey
         this.view.dispatch({
-            effects: this.keymapCompartment.reconfigure(getKeymapExtensions(this, keymap, keyBindings)),
+            effects: [
+                this.vimCompartment.reconfigure(keymap === "vim" ? getVimExtensions(this) : []),
+                this.keymapCompartment.reconfigure(getKeymapExtensions(this, keymap, keyBindings)),
+            ],
         })
     }
 

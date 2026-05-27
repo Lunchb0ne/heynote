@@ -140,6 +140,7 @@
             loadBuffer(path) {
                 //console.log("loadBuffer", path)
                 if (this.editor) {
+                    toRaw(this.editor).onVimModeChange = null
                     this.editor.hide()
                 }
 
@@ -148,15 +149,20 @@
                     focus: focusEditor,
                 })
                 this.editor = editor
+                const rawEditor = toRaw(editor)
+                const heynoteStore = useHeynoteStore()
+                rawEditor.onVimModeChange = (mode) => heynoteStore.setVimMode(mode)
+                heynoteStore.setVimMode(rawEditor._vimMode || "normal")
+
                 if (!created) {
-                    toRaw(editor).show()
+                    rawEditor.show()
                     if (focusEditor) {
-                        toRaw(editor).focus()
+                        rawEditor.focus()
                     }
                 }
 
-                this.currentEditor = toRaw(this.editor)
-                window._heynote_editor = toRaw(this.editor)
+                this.currentEditor = rawEditor
+                window._heynote_editor = rawEditor
             },
 
             setLanguage(language) {
@@ -190,7 +196,7 @@
 <template>
     <div>
         <div class="editor" ref="editor" @contextmenu="onContextMenu"></div>
-        <div 
+        <div
             v-if="debugSyntaxTree"
             v-html="syntaxTreeDebugContent"
             class="debug-syntax-tree"

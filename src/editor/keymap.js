@@ -1,8 +1,9 @@
-import { keymap } from "@codemirror/view"
+import { keymap, ViewPlugin } from "@codemirror/view"
 import { Prec } from "@codemirror/state"
 
 import { keyName } from "w3c-keyname"
 
+import { vim, getCM } from "@replit/codemirror-vim"
 
 import { HEYNOTE_COMMANDS } from "./commands.js"
 
@@ -190,6 +191,155 @@ export const EMACS_KEYMAP = [
 ]
 
 
+// DEFAULT_KEYMAP minus Escape (vim owns Escape for mode transitions).
+// All Mod-* and Alt-* bindings are safe since vim normal mode doesn't use those.
+// Basic editing (Enter, Backspace, Delete) is included: vim intercepts in normal
+// mode before CM6 keymaps fire; in insert mode vim passes through to these handlers.
+export const VIM_KEYMAP = [
+    cmd("Enter", "insertNewlineAndIndent"),
+
+    cmd("Mod-a", "selectAll"),
+    cmd("Mod-Enter", "addNewBlockAfterCurrent"),
+    cmd("Mod-Shift-Enter", "addNewBlockAfterLastAndScrollDown"),
+    cmd("Alt-Enter", "addNewBlockBeforeCurrent"),
+    cmd("Alt-Shift-Enter", "addNewBlockBeforeFirst"),
+    cmd("Mod-Alt-Enter", "insertNewBlockAtCursor"),
+    ...cmdShift("ArrowLeft", "cursorCharLeft", "selectCharLeft"),
+    ...cmdShift("ArrowRight", "cursorCharRight", "selectCharRight"),
+    ...cmdShift("ArrowUp", "cursorLineUp", "selectLineUp"),
+    ...cmdShift("ArrowDown", "cursorLineDown", "selectLineDown"),
+    ...cmdShift("Ctrl-ArrowLeft", "cursorGroupLeft", "selectGroupLeft"),
+    ...cmdShift("Ctrl-ArrowRight", "cursorGroupRight", "selectGroupRight"),
+    ...cmdShift("Alt-ArrowLeft", "cursorGroupLeft", "selectGroupLeft"),
+    ...cmdShift("Alt-ArrowRight", "cursorGroupRight", "selectGroupRight"),
+    ...cmdShift("Mod-ArrowUp", "cursorPreviousBlock", "selectPreviousBlock"),
+    ...cmdShift("Mod-ArrowDown", "cursorNextBlock", "selectNextBlock"),
+    ...cmdShift("Ctrl-ArrowUp", "cursorPreviousParagraph", "selectPreviousParagraph"),
+    ...cmdShift("Ctrl-ArrowDown", "cursorNextParagraph", "selectNextParagraph"),
+    ...cmdShift("PageUp", "cursorPageUp", "selectPageUp"),
+    ...cmdShift("PageDown", "cursorPageDown", "selectPageDown"),
+    ...cmdShift("Home", "cursorLineBoundaryBackward", "selectLineBoundaryBackward"),
+    ...cmdShift("End", "cursorLineBoundaryForward", "selectLineBoundaryForward"),
+    ...cmdShift("Ctrl-Home", "cursorDocStart", "selectDocStart"),
+    ...cmdShift("Ctrl-End", "cursorDocEnd", "selectDocEnd"),
+    cmd("Alt-Mod-Shift-ArrowUp", "moveCurrentBlockUp"),
+    cmd("Alt-Mod-Shift-ArrowDown", "moveCurrentBlockDown"),
+    cmd("Alt-Shift-d", "insertDateAndTime"),
+    cmd("Backspace", "deleteCharBackward"),
+    cmd("Delete", "deleteCharForward"),
+    // Escape intentionally omitted — vim owns it for mode transitions
+    cmd("Ctrl-Backspace", "deleteGroupBackward"),
+    cmd("Ctrl-Delete", "deleteGroupForward"),
+    ...(isMac ? [
+        cmd("Alt-Backspace", "deleteGroupBackward"),
+        cmd("Alt-Delete", "deleteGroupForward"),
+        cmd("Mod-Backspace", "deleteLineBoundaryBackward"),
+        cmd("Mod-Delete", "deleteLineBoundaryForward"),
+        ...cmdShift("Mod-ArrowLeft", "cursorLineBoundaryBackward", "selectLineBoundaryBackward"),
+        ...cmdShift("Mod-ArrowRight", "cursorLineBoundaryForward", "selectLineBoundaryForward"),
+    ] : []),
+
+    cmd("Alt-ArrowUp", "moveLineUp"),
+    cmd("Alt-ArrowDown", "moveLineDown"),
+    cmd("Alt-Shift-ArrowUp", "copyLineUp"),
+    cmd("Alt-Shift-ArrowDown", "copyLineDown"),
+    cmd("Mod-Shift-k", "deleteLine"),
+    cmd("Mod-Alt-ArrowDown", "newCursorBelow"),
+    cmd("Mod-Alt-ArrowUp", "newCursorAbove"),
+    cmd("Mod-Shift-d", "deleteBlock"),
+    cmd(isMac ? "Cmd-Shift-[" : "Ctrl-Shift-[", "foldCode"),
+    cmd(isMac ? "Cmd-Shift-]" : "Ctrl-Shift-]", "unfoldCode"),
+
+    cmd("Mod-d", "selectNextOccurrence"),
+    cmd("Mod-f", "openSearchPanel", "editor search-panel"),
+    cmd("F3", "findNext", "editor search-panel"),
+    cmd("Mod-g", "findNext", "editor search-panel"),
+    cmd("Shift-F3", "findPrevious", "editor search-panel"),
+    cmd("Shift-Mod-g", "findPrevious", "editor search-panel"),
+    // Escape → closeSearchPanel intentionally omitted
+    cmd("Mod-Shift-l", "selectSelectionMatches"),
+    cmd("Mod-Shift-l", "nothing"),
+
+    cmd("Mod-c", "copy"),
+    cmd("Mod-x", "cut"),
+    cmd("Mod-v", "paste"),
+    cmd("Mod-z", "undo"),
+    cmd("Mod-Shift-z", "redo"),
+    ...(isWindows || isLinux ? [
+        cmd("Mod-y", "redo"),
+    ] : []),
+
+    cmd("Tab", "insertIndentation"),
+    cmd("Shift-Tab", "indentLess"),
+
+    cmd("Mod-l", "openLanguageSelector"),
+    cmd("Mod-p", "openBufferSelector"),
+    cmd("Mod-Shift-p", "openCommandPalette"),
+    cmd("Mod-s", "openMoveToBuffer"),
+    cmd("Mod-n", "openCreateNewBuffer"),
+
+    cmd("Alt-Shift-f", "formatBlockContent"),
+    cmd("Mod-Shift-Space", "toggleCheckbox"),
+
+    cmd("Mod-/", "toggleComment"),
+    cmd("Alt-Shift-a", "toggleBlockComment"),
+
+    ...(isMac ? [
+        cmd("Alt-Cmd-[", "foldBlock"),
+        cmd("Alt-Cmd-]", "unfoldBlock"),
+        cmd("Alt-Cmd-.", "toggleBlockFold")
+    ] : [
+        cmd("Alt-Ctrl-[", "foldBlock"),
+        cmd("Alt-Ctrl-]", "unfoldBlock"),
+        cmd("Alt-Ctrl-.", "toggleBlockFold")
+    ]),
+
+    cmd("Mod-w", "closeCurrentTab"),
+    cmd("Mod-Shift-t", "reopenLastClosedTab"),
+    cmd("Ctrl-Tab", "nextTab"),
+    cmd("Ctrl-Shift-Tab", "previousTab"),
+    cmd("Mod-1", "switchToTab1"),
+    cmd("Mod-2", "switchToTab2"),
+    cmd("Mod-3", "switchToTab3"),
+    cmd("Mod-4", "switchToTab4"),
+    cmd("Mod-5", "switchToTab5"),
+    cmd("Mod-6", "switchToTab6"),
+    cmd("Mod-7", "switchToTab7"),
+    cmd("Mod-8", "switchToTab8"),
+    cmd("Mod-9", "switchToTab9"),
+    cmd("Mod-0", "switchToLastTab"),
+
+    cmd("Mod-Shift-s", "toggleLeftPanel"),
+    cmd("Mod-Shift-e", "openBufferExplorer"),
+    cmd("Mod-Shift-f", "openLibrarySearch"),
+]
+
+export function getVimExtensions(editor) {
+    const modeTracker = ViewPlugin.fromClass(class {
+        constructor(view) {
+            this._cm = getCM(view)
+            this._handler = ({ mode, subMode }) => {
+                const fullMode = subMode ? `${mode} ${subMode}` : mode
+                editor._vimMode = fullMode
+                editor.onVimModeChange?.(fullMode)
+            }
+            if (this._cm) {
+                this._cm.on("vim-mode-change", this._handler)
+                // Initialize with current mode
+                const vimState = this._cm.state?.vim
+                editor._vimMode = vimState?.mode || "normal"
+            }
+        }
+        destroy() {
+            if (this._cm) {
+                this._cm.off("vim-mode-change", this._handler)
+            }
+        }
+    })
+
+    return [vim(), modeTracker]
+}
+
 function keymapFromSpec(specs, editor) {
     return keymap.of(specs.map((spec) => {
         let key = spec.key
@@ -220,9 +370,17 @@ function keymapFromSpec(specs, editor) {
 
 
 function getCombinedKeymapSpec(keymapName, userKeymap) {
+    let baseKeymap
+    if (keymapName === "vim") {
+        baseKeymap = VIM_KEYMAP
+    } else if (keymapName === "emacs") {
+        baseKeymap = [...EMACS_KEYMAP, ...DEFAULT_KEYMAP]
+    } else {
+        baseKeymap = [...DEFAULT_NOT_EMACS_KEYMAP, ...DEFAULT_KEYMAP]
+    }
     return [
         ...(userKeymap ? userKeymap : []),
-        ...(keymapName === "emacs" ? [...EMACS_KEYMAP, ...DEFAULT_KEYMAP] : [...DEFAULT_NOT_EMACS_KEYMAP, ...DEFAULT_KEYMAP]),
+        ...baseKeymap,
     ]
 }
 
