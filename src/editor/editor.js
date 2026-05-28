@@ -345,6 +345,15 @@ export class HeynoteEditor {
         })
     }
 
+    setVimMode(mode, subMode) {
+        // Called by the vim mode reporter ViewPlugin. We forward to the
+        // settings store, which the StatusBar reads from. Routing through the
+        // editor instance (rather than importing the store directly) keeps
+        // the vim module free of Pinia knowledge and makes it easy to unit
+        // test in isolation.
+        this.notesStore.setVimMode(mode, subMode)
+    }
+
     setSpellcheckEnabled(enabled) {
         this.spellcheckEnabled = enabled
         this.view.dispatch({

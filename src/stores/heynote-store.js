@@ -56,6 +56,11 @@ export const useHeynoteStore = defineStore("heynote", {
         isFullscreen: false,
         isFocused: true,
         systemLocale: navigator.language,
+
+        // Current vim mode for the active editor, or null when vim keymap is
+        // not in use. Written by the vim mode reporter in src/editor/vim/.
+        vimMode: null,
+        vimSubMode: "",
     }),
 
     actions: {
@@ -72,6 +77,11 @@ export const useHeynoteStore = defineStore("heynote", {
                 return
             }
             this.currentEditor.focus()
+        },
+
+        setVimMode(mode, subMode) {
+            this.vimMode = mode
+            this.vimSubMode = subMode || ""
         },
 
         setLeftPanelVisible(visible, persist = true) {

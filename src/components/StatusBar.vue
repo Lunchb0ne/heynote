@@ -35,12 +35,14 @@
             ...mapState(useHeynoteStore, [
                 "currentBufferName",
                 "currentCursorLine",
-                "currentLanguage", 
-                "currentSelectionSize", 
+                "currentLanguage",
+                "currentSelectionSize",
                 "currentLanguage",
                 "currentLanguageAuto",
                 "currentCreatedTime",
                 "systemLocale",
+                "vimMode",
+                "vimSubMode",
             ]),
             ...mapState(useSettingsStore, [
                 "spellcheckEnabled",
@@ -64,6 +66,22 @@
 
             cmdKey() {
                 return window.heynote.platform.isMac ? "⌘" : "Ctrl"
+            },
+
+            vimModeLabel() {
+                if (!this.vimMode) {
+                    return null
+                }
+                switch (this.vimMode) {
+                    case "normal": return "NORMAL"
+                    case "insert": return "INSERT"
+                    case "replace": return "REPLACE"
+                    case "visual":
+                        if (this.vimSubMode === "linewise") return "V-LINE"
+                        if (this.vimSubMode === "blockwise") return "V-BLOCK"
+                        return "VISUAL"
+                    default: return this.vimMode.toUpperCase()
+                }
             },
 
             formatBlockTitle() {
@@ -106,12 +124,19 @@
 
 <template>
     <div :class="className">
-        <div 
+        <div
             @click.stop="$emit('toggleLeftPanel')"
             class="status-block sidebar clickable"
             :title="getTooltip('Toggle Sidebar', 'toggleLeftPanel')"
         >
             <span class="icon icon-format"></span>
+        </div>
+        <div
+            v-if="vimModeLabel"
+            class="status-block vim-mode"
+            :class="'vim-mode-' + vimMode"
+        >
+            {{ vimModeLabel }}
         </div>
         <div class="status-block line-number">
             Ln <span class="num">{{ currentCursorLine?.line }}</span>
@@ -233,6 +258,16 @@
                 color: rgba(255, 255, 255, 0.55)
                 .num
                     color: rgba(255, 255, 255, 0.75)
+        .vim-mode
+            font-weight: 600
+            letter-spacing: 0.04em
+            color: rgba(255, 255, 255, 0.95)
+            &.vim-mode-insert
+                background-color: rgba(80, 160, 80, 0.55)
+            &.vim-mode-replace
+                background-color: rgba(200, 80, 80, 0.55)
+            &.vim-mode-visual
+                background-color: rgba(200, 150, 50, 0.55)
         .lang .auto
             color: rgba(255, 255, 255, 0.7)
             +dark-mode

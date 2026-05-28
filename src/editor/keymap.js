@@ -5,6 +5,7 @@ import { keyName } from "w3c-keyname"
 
 
 import { HEYNOTE_COMMANDS } from "./commands.js"
+import { vimExtensions } from "./vim/index.js"
 
 
 const cmd = (key, command, scope) => ({key, command, scope})
@@ -227,9 +228,16 @@ function getCombinedKeymapSpec(keymapName, userKeymap) {
 }
 
 export function getKeymapExtensions(editor, keymap, keyBindings) {
-    return [
-        keymapFromSpec(getCombinedKeymapSpec(keymap, keyBindings), editor)
-    ]
+    const heynoteLayer = keymapFromSpec(getCombinedKeymapSpec(keymap, keyBindings), editor)
+    if (keymap === "vim") {
+        // Earlier entries in a CM6 extension array have higher precedence, so
+        // vim must come first to claim keys like `Enter` (normal-mode jump)
+        // before Heynote's `Enter -> insertNewlineAndIndent` runs. Vim
+        // returns false for keys it doesn't bind (notably Mod- chords),
+        // letting them fall through to the Heynote layer below.
+        return [vimExtensions(editor), heynoteLayer]
+    }
+    return [heynoteLayer]
 }
 
 /**

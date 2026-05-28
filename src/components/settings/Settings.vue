@@ -34,6 +34,7 @@
                 keymaps: [
                     { name: "Default", value: "default" },
                     { name: "Emacs", value: "emacs" },
+                    { name: "Vim", value: "vim" },
                 ],
                 keymap: this.initialSettings.keymap,
                 keyBindings: this.initialSettings.keyBindings || [],
