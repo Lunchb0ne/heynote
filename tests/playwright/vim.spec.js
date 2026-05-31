@@ -94,3 +94,26 @@ test("Switching keymap away from vim removes the indicator", async ({ page }) =>
     await heynotePage.setSettings({ ...settings, keymap: "default" })
     await expect(page.locator("css=.status-block.vim-mode")).not.toBeVisible()
 })
+
+
+test("insert-mode Backspace merges an empty block into the previous one (parity with default)", async ({ page }) => {
+    // Empty block 1 ("foo()") cleanly from normal mode, then probe insert-mode
+    // Backspace at the start of the empty block. Atomic ranges should absorb
+    // the trailing delimiter and merge the empty block into the previous one
+    // — matching default-mode behavior.
+    const blocks = await heynotePage.getBlocks()
+    await heynotePage.setCursorPosition(blocks[1].content.from)
+    // dd in normal mode empties block 1's content (delimiter stays).
+    await page.locator("body").press("d")
+    await page.locator("body").press("d")
+    expect((await heynotePage.getBlocks()).length).toBe(3)
+    expect(await heynotePage.getBlockContent(1)).toBe("")
+    // Enter insert mode and press Backspace at the start of the empty block.
+    await page.locator("body").press("i")
+    await expect(page.locator("css=.status-block.vim-mode")).toHaveText("INSERT")
+    await page.locator("body").press("Backspace")
+    const after = await heynotePage.getBlocks()
+    expect(after.length).toBe(2)
+    expect(await heynotePage.getBlockContent(0)).toBe("hello")
+    expect(await heynotePage.getBlockContent(1)).toBe("world")
+})
