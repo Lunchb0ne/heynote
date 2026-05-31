@@ -262,6 +262,8 @@
             font-weight: 600
             letter-spacing: 0.04em
             color: rgba(255, 255, 255, 0.95)
+            &.vim-mode-normal
+                background-color: rgba(255, 255, 255, 0.12)
             &.vim-mode-insert
                 background-color: rgba(80, 160, 80, 0.55)
             &.vim-mode-replace
