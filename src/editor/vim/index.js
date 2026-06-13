@@ -4,13 +4,8 @@ import { vim, getCM, Vim } from "@replit/codemirror-vim"
 
 import { protectAllDelimiters } from "../block/block.js"
 import { HEYNOTE_COMMANDS } from "../commands.js"
-
-// Map from a CodeMirror EditorView to the HeynoteEditor that owns it. The
-// vim package defines ex commands globally on a singleton, so command
-// implementations need to resolve the active editor at call time (not
-// capture one at registration) — otherwise users with multiple tabs would
-// always close the wrong tab.
-const viewToEditor = new WeakMap()
+import { viewToEditor } from "./shared.js"
+import { registerVimCustomizations } from "./customize.js"
 
 // Define ex-command aliases for keys vim users press reflexively. Defined
 // once at module load; the implementations resolve the active editor via
@@ -47,6 +42,7 @@ function registerExCommands() {
  */
 export function vimExtensions(editor) {
     registerExCommands()
+    registerVimCustomizations()
     const protection = new Compartment()
     return [
         vim(),
