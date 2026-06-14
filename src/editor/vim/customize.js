@@ -2,25 +2,7 @@ import { Vim } from "@replit/codemirror-vim"
 
 import { getActiveNoteBlock } from "../block/block.js"
 import { HEYNOTE_COMMANDS } from "../commands.js"
-import { viewToEditor, firstNonWhitespaceColumn, stripBlockDelimiters } from "./shared.js"
-
-let registered = false
-
-/**
- * Applies Heynote-native customizations to the global Vim singleton. Safe to
- * call on every editor mount; the work runs only once. Editor-specific state
- * is resolved per-call via viewToEditor, so a single registration serves all
- * editors/tabs.
- */
-export function registerVimCustomizations() {
-    if (registered) {
-        return
-    }
-    registered = true
-    registerYankStrip()
-    registerBlockMotions()
-    registerSearchRedirect()
-}
+import { editorFacet, firstNonWhitespaceColumn, stripBlockDelimiters } from "./shared.js"
 
 /**
  * Yank that strips block delimiters from the captured text. This lets a visual
@@ -29,11 +11,10 @@ export function registerVimCustomizations() {
  * register holds clean content. Paste then reinserts ordinary text without
  * ever re-introducing a ∞∞∞ delimiter into another block.
  */
-function registerYankStrip() {
+export function registerYankStrip() {
     Vim.defineOperator("yank", (cm, args, ranges, oldAnchor) => {
         const vim = cm.state.vim
-        const rawText = cm.getSelection()
-        const text = stripBlockDelimiters(rawText)
+        const text = stripBlockDelimiters(cm.getSelection())
         const endPos = vim.visualMode
             ? posMin(vim.sel.anchor, vim.sel.head, ranges[0].head, ranges[0].anchor)
             : oldAnchor
@@ -64,7 +45,7 @@ function posMin(...positions) {
  * "5G" matching the 5th line of the current block is the least surprising
  * behavior. Cross-block navigation remains available via Mod-↑ / Mod-↓.
  */
-function registerBlockMotions() {
+export function registerBlockMotions() {
     Vim.defineMotion("moveToLineOrEdgeOfDocument", (cm, _head, motionArgs) => {
         // The vim package represents cursor positions as plain { line, ch }
         // objects (0-indexed line), so we return the same shape here.
@@ -103,21 +84,37 @@ function registerBlockMotions() {
  * *, #, and search-composed operators (d/foo, cgn) are intentionally not
  * supported — use Mod-d (select next occurrence) instead.
  */
-function registerSearchRedirect() {
-    const runCommand = (cm, commandName) => {
-        const editor = viewToEditor.get(cm.cm6)
-        if (!editor) {
-            return
+export function registerSearchRedirect() {
+    bindSearchKey("/", "openSearchPanel")
+    bindSearchKey("?", "openSearchPanel")
+    bindSearchKey("n", "findNext")
+    bindSearchKey("N", "findPrevious")
+}
+
+function bindSearchKey(key, heynoteCommand) {
+    const actionName = `heynote_${heynoteCommand}`
+    Vim.defineAction(actionName, (cm) => {
+        const editor = cm.cm6.state.facet(editorFacet)
+        if (editor) {
+            HEYNOTE_COMMANDS[heynoteCommand].run(editor)(cm.cm6)
         }
-        HEYNOTE_COMMANDS[commandName].run(editor)(cm.cm6)
+    })
+    Vim.mapCommand(key, "action", actionName, {}, { context: "normal" })
+}
+
+/**
+ * Ex-command aliases for keys vim users press reflexively. Vim ships none of
+ * these by default; without aliases users see "Not an editor command" in the
+ * panel. :w is a no-op (Heynote auto-saves); :q / :wq / :x close the current
+ * tab via Heynote's own command.
+ */
+export function registerExCommands() {
+    const closeTab = (cm) => {
+        const editor = cm.cm6.state.facet(editorFacet)
+        if (editor) HEYNOTE_COMMANDS.closeCurrentTab.run(editor)(editor.view)
     }
-
-    Vim.defineAction("heynoteOpenSearch", (cm) => runCommand(cm, "openSearchPanel"))
-    Vim.defineAction("heynoteFindNext", (cm) => runCommand(cm, "findNext"))
-    Vim.defineAction("heynoteFindPrevious", (cm) => runCommand(cm, "findPrevious"))
-
-    Vim.mapCommand("/", "action", "heynoteOpenSearch", {}, { context: "normal" })
-    Vim.mapCommand("?", "action", "heynoteOpenSearch", {}, { context: "normal" })
-    Vim.mapCommand("n", "action", "heynoteFindNext", {}, { context: "normal" })
-    Vim.mapCommand("N", "action", "heynoteFindPrevious", {}, { context: "normal" })
+    Vim.defineEx("write", "w", () => { /* Heynote auto-saves */ })
+    Vim.defineEx("quit", "q", closeTab)
+    Vim.defineEx("wq", "wq", closeTab)
+    Vim.defineEx("xit", "x", closeTab)
 }

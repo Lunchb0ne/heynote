@@ -108,10 +108,7 @@ async function runExAndCollectPanel(page, exCmd) {
     await page.locator("body").pressSequentially(exCmd)
     await page.locator("body").press("Enter")
     await page.waitForTimeout(100)
-    const messages = page.locator("css=.cm-vim-message")
-    const count = await messages.count()
-    const texts = []
-    for (let i = 0; i < count; i++) texts.push(await messages.nth(i).innerText())
+    const texts = await page.locator("css=.cm-vim-message").allInnerTexts()
     return texts.join(" | ")
 }
 

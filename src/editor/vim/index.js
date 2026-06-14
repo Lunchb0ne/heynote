@@ -1,34 +1,19 @@
-import { Compartment } from "@codemirror/state"
+import { EditorState, StateEffect, StateField } from "@codemirror/state"
 import { ViewPlugin } from "@codemirror/view"
-import { vim, getCM, Vim } from "@replit/codemirror-vim"
+import { vim, getCM } from "@replit/codemirror-vim"
 
-import { protectAllDelimiters } from "../block/block.js"
-import { HEYNOTE_COMMANDS } from "../commands.js"
-import { viewToEditor } from "./shared.js"
-import { registerVimCustomizations } from "./customize.js"
-
-// Define ex-command aliases for keys vim users press reflexively. Defined
-// once at module load; the implementations resolve the active editor via
-// viewToEditor at call time.
-let exCommandsRegistered = false
-function registerExCommands() {
-    if (exCommandsRegistered) return
-    exCommandsRegistered = true
-    const closeTab = (cm) => {
-        const editor = viewToEditor.get(cm.cm6)
-        if (editor) HEYNOTE_COMMANDS.closeCurrentTab.run(editor)(editor.view)
-    }
-    Vim.defineEx("write", "w", () => { /* Heynote auto-saves */ })
-    Vim.defineEx("quit", "q", closeTab)
-    Vim.defineEx("wq", "wq", closeTab)
-    Vim.defineEx("xit", "x", closeTab)
-}
+import { blockState } from "../block/block.js"
+import { heynoteEvent } from "../annotation.js"
+import { editorFacet } from "./shared.js"
+import {
+    registerBlockMotions, registerExCommands, registerSearchRedirect, registerYankStrip,
+} from "./customize.js"
 
 /**
  * Builds the set of CodeMirror extensions that make up Heynote's vim mode.
  *
  * Returned as an array so callers can spread it into the keymap compartment
- * alongside the Heynote keymap. The protectAllDelimiters changeFilter is
+ * alongside the Heynote keymap. The delimiter-protection changeFilter is
  * mounted here (rather than globally) so default/emacs keymaps keep their
  * existing protection semantics unchanged — only vim mode pulls in the
  * broader guard that catches dd / :%s / macros / etc.
@@ -41,22 +26,80 @@ function registerExCommands() {
  * the previous block."
  */
 export function vimExtensions(editor) {
-    registerExCommands()
-    registerVimCustomizations()
-    const protection = new Compartment()
+    initializeVimGlobals()
     return [
         vim(),
-        protection.of(protectAllDelimiters),
-        vimModeReporter(editor, protection),
+        editorFacet.of(editor),
+        vimModeField,
+        vimGatedDelimiterProtection,
+        vimModeReporter(editor),
     ]
 }
 
-// Vim modes that allow a single transaction to span multiple blocks.
+// All registrations on the global Vim singleton happen once for the process.
+// vimExtensions() may be called many times (one per editor mount, plus once
+// per keymap setting change), but the configuration it installs is global.
+let globalsInitialized = false
+function initializeVimGlobals() {
+    if (globalsInitialized) return
+    globalsInitialized = true
+    registerExCommands()
+    registerYankStrip()
+    registerBlockMotions()
+    registerSearchRedirect()
+}
+
+// Vim modes in which a single transaction can span multiple blocks (operators
+// over multi-line selections, ex-substitute, etc.). Insert / replace are
+// single-position edits where atomic-range absorption handles boundary cases
+// correctly, so we drop protection there to restore the default-mode
+// affordance of "Backspace at start of block merges with previous block".
 const PROTECTED_MODES = new Set(["normal", "visual"])
+
+const setVimMode = StateEffect.define()
+
+// Tracks the current vim mode of this editor's view. The mode reporter
+// dispatches setVimMode effects; the change filter below reads the field to
+// decide whether to protect delimiters. Living in state (rather than a
+// reconfigured compartment) means there's no extension churn on every i/Esc
+// keystroke.
+const vimModeField = StateField.define({
+    create: () => "normal",
+    update(value, tr) {
+        for (const e of tr.effects) {
+            if (e.is(setVimMode)) return e.value
+        }
+        return value
+    },
+})
+
+// Protects every block delimiter from any external edit when vim is in a
+// "protected" mode. Heynote's own commands carry a heynoteEvent annotation
+// and bypass this filter. This catches dd / :%s / macros / etc.; in
+// insert/replace mode the filter is a no-op so atomic-range absorption can
+// merge blocks via Backspace.
+const vimGatedDelimiterProtection = EditorState.changeFilter.of((tr) => {
+    const mode = tr.startState.field(vimModeField, false)
+    if (!PROTECTED_MODES.has(mode)) {
+        return
+    }
+    if (tr.annotations.some(a => a.type === heynoteEvent)) {
+        return
+    }
+    const blocks = tr.startState.field(blockState)
+    if (!blocks.length) {
+        return
+    }
+    const protect = []
+    for (const block of blocks) {
+        protect.push(block.delimiter.from, block.delimiter.to)
+    }
+    return protect
+})
 
 const MAX_ATTACH_RETRIES = 30  // ~500ms at 60fps; vim() always mounts well before this
 
-const vimModeReporter = (editor, protection) => ViewPlugin.fromClass(class {
+const vimModeReporter = (editor) => ViewPlugin.fromClass(class {
     constructor(view) {
         this.view = view
         this.editor = editor
@@ -69,16 +112,12 @@ const vimModeReporter = (editor, protection) => ViewPlugin.fromClass(class {
             this.lastMode = mode
             this.lastSubMode = subMode || ""
             this._sync()
-            const shouldProtect = PROTECTED_MODES.has(mode)
-            this.view.dispatch({
-                effects: protection.reconfigure(shouldProtect ? protectAllDelimiters : []),
-            })
+            this.view.dispatch({ effects: setVimMode.of(mode) })
         }
         // When this editor regains focus (e.g. user switched tabs), re-emit
         // its mode so the shared StatusBar reflects this editor and not
         // whichever editor last fired a mode change.
         this.focusListener = () => this._sync()
-        viewToEditor.set(view, editor)
         this.attach()
     }
 
@@ -104,9 +143,9 @@ const vimModeReporter = (editor, protection) => ViewPlugin.fromClass(class {
         this.cm = cm
         cm.on("vim-mode-change", this.handler)
         this.view.contentDOM.addEventListener("focus", this.focusListener)
-        // Surface the initial mode to the UI synchronously; the protection
-        // compartment is already mounted with protectAllDelimiters, which
-        // matches the initial "normal" mode, so no reconfigure needed yet.
+        // Surface the initial mode to the UI synchronously; vimModeField
+        // already defaults to "normal", matching the actual vim state, so no
+        // dispatch is needed yet.
         this._sync()
     }
 
@@ -121,7 +160,6 @@ const vimModeReporter = (editor, protection) => ViewPlugin.fromClass(class {
         if (this.view?.contentDOM) {
             this.view.contentDOM.removeEventListener("focus", this.focusListener)
         }
-        viewToEditor.delete(this.view)
         if (this.editor.setVimMode) {
             this.editor.setVimMode(null, "")
         }

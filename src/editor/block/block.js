@@ -244,29 +244,6 @@ const preventFirstBlockFromBeingDeleted = EditorState.changeFilter.of((tr) => {
 })
 
 /**
- * Protects ALL block delimiters from being modified. Intended to be mounted
- * only when an external keymap (e.g. vim) might produce edits that don't go
- * through Heynote's block-aware command paths. Heynote's own commands carry a
- * heynoteEvent annotation and bypass this filter.
- *
- * Exported for use inside the keymap compartment (see src/editor/vim/).
- */
-export const protectAllDelimiters = EditorState.changeFilter.of((tr) => {
-    if (tr.annotations.some(a => a.type === heynoteEvent)) {
-        return
-    }
-    const blocks = tr.startState.field(blockState)
-    if (!blocks.length) {
-        return
-    }
-    const protect = []
-    for (const block of blocks) {
-        protect.push(block.delimiter.from, block.delimiter.to)
-    }
-    return protect
-})
-
-/**
  * Transaction filter to prevent the selection from being before the first block
   */
 const preventSelectionBeforeFirstBlock = EditorState.transactionFilter.of((tr) => {
