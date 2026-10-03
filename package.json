@@ -89,6 +89,7 @@
     "vuedraggable": "^4.1.0"
   },
   "dependencies": {
+    "@replit/codemirror-vim": "^6.3.0",
     "@sindresorhus/slugify": "^2.2.1",
     "@vscode/ripgrep": "^1.17.0",
     "electron-log": "^5.0.1",

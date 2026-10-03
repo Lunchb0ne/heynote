@@ -34,7 +34,7 @@ const schema = {
     settings: {
         type: "object",
         properties: {
-            "keymap": { "enum": ["default", "emacs"], default:"default" },
+            "keymap": { "enum": ["default", "emacs", "vim"], default:"default" },
             "emacsMetaKey": { "enum": [null, "alt", "meta"], default: null },
             "keyBindings": {
                 "type": "array",

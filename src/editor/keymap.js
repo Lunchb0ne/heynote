@@ -1,4 +1,5 @@
 import { keymap } from "@codemirror/view"
+import { vim } from "@replit/codemirror-vim"
 import { Prec } from "@codemirror/state"
 
 import { keyName } from "w3c-keyname"
@@ -222,14 +223,18 @@ function keymapFromSpec(specs, editor) {
 function getCombinedKeymapSpec(keymapName, userKeymap) {
     return [
         ...(userKeymap ? userKeymap : []),
-        ...(keymapName === "emacs" ? [...EMACS_KEYMAP, ...DEFAULT_KEYMAP] : [...DEFAULT_NOT_EMACS_KEYMAP, ...DEFAULT_KEYMAP]),
+        ...(keymapName === "emacs" ? [...EMACS_KEYMAP, ...DEFAULT_KEYMAP] : (keymapName === "vim" ? [...DEFAULT_NOT_EMACS_KEYMAP, ...DEFAULT_KEYMAP] : [...DEFAULT_NOT_EMACS_KEYMAP, ...DEFAULT_KEYMAP])),
     ]
 }
 
-export function getKeymapExtensions(editor, keymap, keyBindings) {
-    return [
-        keymapFromSpec(getCombinedKeymapSpec(keymap, keyBindings), editor)
-    ]
+export function getKeymapExtensions(editor, keymapName, keyBindings) {
+    const extensions = [
+        keymapFromSpec(getCombinedKeymapSpec(keymapName, keyBindings), editor)
+    ];
+    if (keymapName === "vim") {
+        extensions.push(vim({ status: true }));
+    }
+    return extensions;
 }
 
 /**

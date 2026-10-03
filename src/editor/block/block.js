@@ -231,7 +231,9 @@ const preventFirstBlockFromBeingDeleted = EditorState.changeFilter.of((tr) => {
         protect.push(0, firstBlockDelimiterSize)
     }
     // if the transaction is a search and replace, we want to protect all block delimiters
-    if (tr.annotations.some(a => a.value === "input.replace" || a.value === "input.replace.all")) {
+    // also protect block delimiters from vim deletion events, because vim operations (like dd) can delete them
+    const isVimEvent = tr.annotations.some(a => a.type.name === "userEvent" && typeof a.value === "string" && a.value.startsWith("vim"));
+    if (tr.annotations.some(a => a.value === "input.replace" || a.value === "input.replace.all") || isVimEvent) {
         const blocks = tr.startState.field(blockState)
         blocks.forEach(block => {
             protect.push(block.delimiter.from, block.delimiter.to)
