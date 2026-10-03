@@ -71,7 +71,8 @@ export default defineConfig({
 					if (process.env.VSCODE_DEBUG) {
 						console.log(/* For `.vscode/.debug.script.mjs` */'[startup] Electron App')
 					} else {
-						options.startup()
+						// HEYNOTE_CDP=9222 exposes Chrome DevTools Protocol for driving the app (e.g. agent-browser connect 9222)
+						options.startup([".", "--no-sandbox", ...(process.env.HEYNOTE_CDP ? [`--remote-debugging-port=${process.env.HEYNOTE_CDP}`] : [])])
 					}
 				},
 				vite: {

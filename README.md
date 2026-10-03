@@ -1,5 +1,8 @@
 # Heynote
 
+> [!NOTE]
+> This is my personal work-in-progress fork of [heyman/heynote](https://github.com/heyman/heynote). Expect lots of slop but a much prettier UI. For the official app, use the upstream repo.
+
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/heyman/heynote)](https://github.com/heyman/heynote/releases)
 [![Build Status](https://github.com/heyman/heynote/workflows/Tests/badge.svg)](https://github.com/heyman/heynote/actions?query=workflow%3ATests)
 
