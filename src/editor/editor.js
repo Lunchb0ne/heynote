@@ -57,6 +57,7 @@ export class HeynoteEditor {
         bracketClosing=false,
         fontFamily,
         fontSize,
+        lineHeight,
         indentType="space",
         tabSize=4,
         defaultBlockToken,
@@ -110,7 +111,7 @@ export class HeynoteEditor {
                 
                 this.themeCompartment.of(theme === "dark" ? heynoteDark : heynoteLight),
                 heynoteBase,
-                this.fontTheme.of(getFontTheme(fontFamily, fontSize)),
+                this.fontTheme.of(getFontTheme(fontFamily, fontSize, lineHeight)),
                 this.indentUnitCompartment.of(indentation(indentType, tabSize)),
                 scrollMargin(),
                 heynoteSearch,
@@ -167,7 +168,7 @@ export class HeynoteEditor {
 
         // trigger setFont once the fonts has loaded
         document.fonts.ready.then(() => {
-            this.setFont(fontFamily, fontSize)
+            this.setFont(fontFamily, fontSize, lineHeight)
         })
     }
 
@@ -324,9 +325,9 @@ export class HeynoteEditor {
         })
     }
 
-    setFont(fontFamily, fontSize) {
+    setFont(fontFamily, fontSize, lineHeight) {
         this.view.dispatch({
-            effects: this.fontTheme.reconfigure(getFontTheme(fontFamily, fontSize)),
+            effects: this.fontTheme.reconfigure(getFontTheme(fontFamily, fontSize, lineHeight)),
             annotations: [heynoteEvent.of(SET_FONT), Transaction.addToHistory.of(false)],
         })
     }

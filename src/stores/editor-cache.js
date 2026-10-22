@@ -40,6 +40,7 @@ export const useEditorCacheStore = defineStore("editorCache", {
                     bracketClosing: settingsStore.settings.bracketClosing,
                     fontFamily: settingsStore.settings.fontFamily,
                     fontSize: settingsStore.settings.fontSize,
+                    lineHeight: settingsStore.settings.lineHeight,
                     indentType: settingsStore.settings.indentType,
                     tabSize: settingsStore.settings.tabSize,
                     defaultBlockToken: settingsStore.settings.defaultBlockLanguage,
@@ -173,7 +174,8 @@ export const useEditorCacheStore = defineStore("editorCache", {
                                 break
                             case "fontFamily":
                             case "fontSize":
-                                editor.setFont(newSettings.fontFamily, newSettings.fontSize)
+                            case "lineHeight":
+                                editor.setFont(newSettings.fontFamily, newSettings.fontSize, newSettings.lineHeight)
                                 break
                             case "indentType":
                             case "tabSize":

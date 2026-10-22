@@ -22,14 +22,20 @@ export const isMonospaceFont = Facet.define({
     combine: values => values.length ? values[0] : true,
 })
 
-export function getFontTheme(fontFamily, fontSize) {
+export const DEFAULT_LINE_HEIGHT = 1.4
+
+export function getFontTheme(fontFamily, fontSize, lineHeight) {
     fontSize = fontSize || window.heynote.defaultFontSize
     const computedFontFamily = fontFamily || window.heynote.defaultFontFamily
+    lineHeight = lineHeight || DEFAULT_LINE_HEIGHT
     return [
         EditorView.theme({
             '.cm-scroller': {
                 fontFamily: computedFontFamily,
                 fontSize: (fontSize) +  "px",
+                lineHeight: lineHeight,
+                // for the line numbers and task checkboxes (base.js), which size against it
+                "--editor-line-height": lineHeight,
             },
         }),
         // in order to avoid a short flicker when the program is loaded with the default font (Hack), 

@@ -94,6 +94,7 @@ const schema = {
             // future and have it apply to existing users
             "fontFamily": {type: "string"},
             "fontSize": {type: "integer"},
+            "lineHeight": {type: "number"},
             // font of everything but the editor; unset means the system font
             "uiFontFamily": {type: "string"},
 

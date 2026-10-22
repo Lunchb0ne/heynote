@@ -64,12 +64,12 @@ export const heynoteBase = EditorView.theme({
         padding: '0 0 0 12px',
         userSelect: 'none',
     },
-    // the smaller numbers keep the code's line height (1.4 of the editor font) so they don't ride
-    // high, and drop to share the code's baseline
+    // the smaller numbers keep the code's line height (the Line Height setting, see font-theme.js) so
+    // they don't ride high, and drop to share the code's baseline
     ".cm-lineNumbers .cm-gutterElement": {
         padding: '0',
         fontSize: '0.85em',
-        lineHeight: 'calc(1.4em / 0.85)',
+        lineHeight: 'calc(var(--editor-line-height) / 0.85)',
         position: 'relative',
         top: '0.07em',
         fontVariantNumeric: 'tabular-nums',
@@ -109,7 +109,7 @@ export const heynoteBase = EditorView.theme({
     // laid over the wrapper's spaces, centered in the line
     ".cm-taskmarker-toggle.monospace input[type=checkbox]": {
         position: "absolute",
-        top: "0.15em",
+        top: "calc((var(--editor-line-height) * 1em - 1.1em) / 2)",
         left: "0.25em",
         marginRight: "0",
     },

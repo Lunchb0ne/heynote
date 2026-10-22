@@ -5,6 +5,7 @@
     import { useHeynoteStore } from "@/src/stores/heynote-store"
 
     import { LANGUAGES } from '../../editor/languages.js'
+    import { DEFAULT_LINE_HEIGHT } from '../../editor/theme/font-theme.js'
     import KeyboardHotkey from "./KeyboardHotkey.vue"
     import TabListItem from "./TabListItem.vue"
     import TabContent from "./TabContent.vue"
@@ -64,6 +65,7 @@
                 bufferPath: this.initialSettings.bufferPath,
                 fontFamily: this.initialSettings.fontFamily || defaultFontFamily,
                 fontSize: this.initialSettings.fontSize || defaultFontSize,
+                lineHeight: this.initialSettings.lineHeight || DEFAULT_LINE_HEIGHT,
                 uiFontFamily: this.initialSettings.uiFontFamily || "",
                 cursorBlinkRate: this.initialSettings.cursorBlinkRate ?? 1000,
                 languageOptions: LANGUAGES.map(l => {
@@ -159,6 +161,7 @@
                     bufferPath: this.bufferPath,
                     fontFamily: this.fontFamily === defaultFontFamily ? undefined : this.fontFamily,
                     fontSize: this.fontSize === defaultFontSize ? undefined : this.fontSize,
+                    lineHeight: this.lineHeight === DEFAULT_LINE_HEIGHT ? undefined : this.lineHeight,
                     uiFontFamily: this.uiFontFamily || undefined,
                     cursorBlinkRate: this.cursorBlinkRate,
                     defaultBlockLanguage: this.defaultBlockLanguage === "text" ? undefined : this.defaultBlockLanguage,
@@ -470,6 +473,17 @@
                                     >{{ size }}px{{ size === defaultFontSize ? " (default)" : "" }}</option>
                                 </select>
                             </div>
+                            <div class="entry">
+                                <h2>Line Height</h2>
+                                <select v-model.number="lineHeight" @change="updateSettings" class="line-height">
+                                    <option :value="1.2">1.2</option>
+                                    <option :value="1.3">1.3 (compact)</option>
+                                    <option :value="1.4">1.4 (default)</option>
+                                    <option :value="1.5">1.5</option>
+                                    <option :value="1.6">1.6</option>
+                                    <option :value="1.8">1.8</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="entry">
@@ -699,7 +713,7 @@
                             display: flex
                             .font-family, .ui-font-family
                                 width: 280px
-                            .font-size
+                            .font-size, .line-height
                                 width: 120px
                         
                         .buffer-location 
