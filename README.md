@@ -1,4 +1,4 @@
-# Heynote
+# Reynote
 
 > [!NOTE]
 > This is my personal work-in-progress fork of [heyman/heynote](https://github.com/heyman/heynote). Expect lots of slop but a much prettier UI. For the official app, use the upstream repo.
@@ -14,16 +14,16 @@ What the fork adds on top of upstream:
 
 -   A Raycast-style design system: one palette built from the text color, roomier dialogs, palettes and status bar
 -   Translucent window (macOS vibrancy), which goes opaque with "Reduce transparency"
--   Blocks separated by full-width dividers, with a framed band behind the block holding the cursor
--   A soft pill on the current line
+-   Blocks separated by full-width dividers, with a framed band behind the block holding the cursor, and per-block selection drawing
+-   A soft pill on the current line that hugs the cursor at any line height
 -   A quieter line-number gutter that lights up the active block, and a drawn fold chevron
 -   Round task checkboxes that pop and strike through when checked
--   Switches for on/off settings, segmented Buffers/Search control
+-   Settings redesigned after macOS System Settings, with icon badges, grouped cards, switches, and segmented controls
 -   Raised chip tabs under one seamless macOS title row
--   Separate Interface Font and Editor Font settings
--   Press feedback, dialog fades and other small motion, all off under "Reduce motion"
+-   Separate Interface Font, Editor Font, and Line Height settings
+-   Press feedback, dialog fades, view-transition theme crossfade, shake on refused actions, and other small motion, all respecting "Reduce motion"
 
-<img src="docs/img/fork-settings-dark.png" width="851" alt="Settings with switches and the Interface Font setting">
+<img src="docs/img/fork-settings-dark.png" width="851" alt="Settings redesigned after macOS System Settings">
 
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/heyman/heynote)](https://github.com/heyman/heynote/releases)
 [![Build Status](https://github.com/heyman/heynote/workflows/Tests/badge.svg)](https://github.com/heyman/heynote/actions?query=workflow%3ATests)
@@ -120,4 +120,3 @@ See the [documentation](https://heynote.com/docs/#user-content-default-key-bindi
 ## Thanks!
 
 Heynote is built upon [CodeMirror](https://codemirror.net/), [Vue](https://vuejs.org/), [Electron](https://www.electronjs.org/), [Math.js](https://mathjs.org/), [Prettier](https://prettier.io/) and other great open-source projects.
-
