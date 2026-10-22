@@ -1,4 +1,4 @@
-import { ViewPlugin, EditorView, Decoration, WidgetType, lineNumbers } from "@codemirror/view"
+import { ViewPlugin, EditorView, Decoration, WidgetType, lineNumbers, GutterMarker, gutterLineClass } from "@codemirror/view"
 import { layer, RectangleMarker } from "@codemirror/view"
 import { EditorState, RangeSetBuilder, StateField, RangeSet, Transaction} from "@codemirror/state";
 import { syntaxTreeAvailable } from "@codemirror/language"
@@ -195,22 +195,15 @@ const blockLayer = layer({
             const fromCoordsTop = view.lineBlockAt(fromPos)?.top
             const toLine = view.state.doc.lineAt(toPos)
             const toLinePos = toLine.length === 0 ? toLine.from : Math.max(fromPos, Math.min(toPos, block.content.to))
-            let toCoordsBottom = view.lineBlockAt(toLinePos)?.bottom
-            if (idx === blocks.length - 1) {
-                // Calculate how much extra height we need to add to the last block
-                let extraHeight = view.viewState.editorHeight - (
-                    view.defaultLineHeight + // when scrolling furthest down, one line is still shown at the top
-                    view.documentPadding.top +
-                    11
-                )
-                toCoordsBottom += extraHeight
-            }
+            const toCoordsBottom = view.lineBlockAt(toLinePos)?.bottom
+            // same geometry as the focus band: 12px past the text on both sides, so the edges meet
+            // the divider in .heynote-block-start. Line block coordinates exclude the top padding.
             markers.push(new RectangleMarker(
                 idx++ % 2 == 0 ? "block-even" : "block-odd",
                 0,
-                fromCoordsTop - 2,
+                fromCoordsTop + view.documentPadding.top - 12,
                 null, // width is set to 100% in CSS
-                (toCoordsBottom - fromCoordsTop) + 15,
+                (toCoordsBottom - fromCoordsTop) + 24,
             ))
         })
         return markers
@@ -221,6 +214,76 @@ const blockLayer = layer({
     },
 
     class: "heynote-blocks-layer"
+})
+
+
+// One full-width band behind the block holding the cursor. CodeMirror reuses a marker's element when
+// its class is unchanged, so moving to another block changes the same element's top/height, and the
+// "slide" class (set only then, before the geometry changes) lets CSS animate it. Typing inside a
+// block resizes the band instantly.
+// "last" marks the last block, which has no divider below to close the band.
+class FocusBandMarker extends RectangleMarker {
+    constructor(top, height, slide, last) {
+        super("heynote-focus-band", 0, top, null, height)
+        this.slide = slide
+        this.last = last
+    }
+    update(elt, prev) {
+        elt.classList.toggle("slide", this.slide)
+        return super.update(elt, prev)
+    }
+    adjust(elt) {
+        super.adjust(elt)
+        elt.classList.toggle("last", this.last)
+    }
+    eq(other) {
+        return super.eq(other) && this.last == other.last
+    }
+}
+
+const focusBandBlock = new WeakMap()
+const focusBand = layer({
+    above: false,
+    markers(view) {
+        const block = getActiveNoteBlock(view.state)
+        if (!block) {
+            return []
+        }
+        const blocks = view.state.field(blockState)
+        const blockIndex = blocks.indexOf(block)
+        const slide = focusBandBlock.has(view) && focusBandBlock.get(view) !== blockIndex
+        focusBandBlock.set(view, blockIndex)
+        // 13px past the text on both sides puts the band's edge rows on the dividers in
+        // .heynote-block-start. Line block coordinates don't include the content's top padding.
+        const top = view.lineBlockAt(block.content.from).top + view.documentPadding.top - 13
+        const bottom = view.lineBlockAt(block.content.to).bottom + view.documentPadding.top + 13
+        return [new FocusBandMarker(top, bottom - top, slide, blockIndex == blocks.length - 1)]
+    },
+    update(update) {
+        return update.docChanged || update.selectionSet || update.viewportChanged || update.geometryChanged
+    },
+    class: "heynote-focus-band-layer",
+})
+
+class ActiveBlockGutterMarker extends GutterMarker {
+    elementClass = "heynote-active-block-gutter"
+}
+const activeBlockGutterMarker = new ActiveBlockGutterMarker()
+
+// marks the gutter lines of the block holding the cursor, so its line numbers can be brighter
+// ponytail: walks every line of the active block on each selection change, viewport-limit it if huge blocks lag
+const activeBlockGutter = gutterLineClass.compute(["selection", blockState], state => {
+    const block = getActiveNoteBlock(state)
+    if (!block) {
+        return RangeSet.empty
+    }
+    const builder = new RangeSetBuilder()
+    const lastLine = state.doc.lineAt(block.content.to).number
+    for (let n = state.doc.lineAt(block.content.from).number; n <= lastLine; n++) {
+        const pos = state.doc.line(n).from
+        builder.add(pos, pos, activeBlockGutterMarker)
+    }
+    return builder.finish()
 })
 
 
@@ -446,6 +509,8 @@ export const noteBlockExtension = (editor) => {
         noteBlockWidget(),
         atomicNoteBlock,
         blockLayer,
+        focusBand,
+        activeBlockGutter,
         preventFirstBlockFromBeingDeleted,
         preventSelectionBeforeFirstBlock,
         emitCursorChange(editor),

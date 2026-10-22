@@ -97,19 +97,57 @@ export const heynoteBase = EditorView.theme({
     '.heynote-blocks-layer .block-even, .heynote-blocks-layer .block-odd': {
         width: '100%',
         boxSizing: 'content-box',
-        borderTop: '1px solid var(--border)',
     },
+    // every other block gets a faint tint so consecutive blocks read apart (fainter than the focus band)
     '.heynote-blocks-layer .block-odd': {
-        background: 'var(--fill-25)',
+        backgroundColor: 'var(--block-alt)',
     },
-    '.heynote-blocks-layer .block-even:first-child': {
-        borderTop: 'none',
-    },
+    // blocks are separated by an edge-to-edge hairline in the gap the delimiter widget leaves between
+    // them, centered with 12px of air on either side. The widget lives in the content column, so the
+    // rule reaches left under the (transparent) gutter, and the scroller clips it at its edge
     '.heynote-block-start': {
-        height: '12px',
+        height: '25px',
+        position: 'relative',
+    },
+    '.heynote-block-start::before': {
+        content: '""',
+        position: 'absolute',
+        top: '12px',
+        left: '-100vw',
+        right: '0',
+        height: '1px',
+        background: 'var(--border-200)',
     },
     '.heynote-block-start.first': {
         height: '0px',
+    },
+    '.heynote-block-start.first::before': {
+        display: 'none',
+    },
+    // full-width band behind the block holding the cursor (see focusBand in block.js). It slides to
+    // the next block, and dims while the editor isn't focused. Its edge rows lie on the dividers,
+    // which frame it; the last block has no divider below, so the band draws its own
+    '.heynote-focus-band-layer': {
+        width: '100%',
+    },
+    '.heynote-focus-band': {
+        width: '100%',
+        backgroundColor: 'var(--focus-band)',
+        transition: 'opacity 200ms ease',
+    },
+    '.heynote-focus-band.last': {
+        boxShadow: 'inset 0 -1px var(--border-200)',
+    },
+    '.heynote-focus-band.slide': {
+        transition: 'top 200ms var(--ease-out), height 200ms var(--ease-out), opacity 200ms ease',
+    },
+    '&:not(.cm-focused) .heynote-focus-band': {
+        opacity: 0.5,
+    },
+    '@media (prefers-reduced-motion: reduce)': {
+        '.heynote-focus-band.slide': {
+            transition: 'opacity 200ms ease',
+        },
     },
     '.heynote-math-result': {
         paddingLeft: "12px",

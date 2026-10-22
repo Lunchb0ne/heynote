@@ -37,9 +37,21 @@ html[platform=mac]
     --bg-rgb: 28 28 30
     --text-rgb: 255 255 255
 
+:root
+    --focus-band: var(--fill-50)
+    --block-alt: rgb(var(--text-rgb) / 0.03)
+
 // native vibrancy (set by the main process on macOS) shows through a light tint of the window color
 html[translucent]
     --window-bg-alpha: 0.4
+// on light glass a grey band reads as a selection; a whiter one reads as the lit, raised block
+html[translucent][theme=light]
+    --focus-band: rgb(255 255 255 / 0.45)
+    --block-alt: rgb(255 255 255 / 0.25)
+// macOS "Reduce transparency" (and the frosted end of the Liquid Glass slider): go opaque
+@media (prefers-reduced-transparency: reduce)
+    html[translucent]
+        --window-bg-alpha: 1
 
 html
     margin: 0
