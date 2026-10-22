@@ -40,7 +40,11 @@ export const heynoteBase = EditorView.theme({
     "&.cm-focused:not(.heynote-has-selection) .cm-activeLine::before": {
         content: '""',
         position: "absolute",
-        inset: "0 8px 0 0",
+        // 1.5px past the cursor at both ends, at any line height. The cursor is the text's box plus 2px
+        // each way, centred in the line like the text.
+        // ponytail: 1.35em guesses the text box (Nordwand Mono's); other fonts can be off by a pixel
+        "--pill-inset": "calc((var(--editor-line-height) * 1em - 1.35em) / 2 - 3.5px)",
+        inset: "var(--pill-inset) 8px var(--pill-inset) 0",
         zIndex: -1,
         borderRadius: "6px",
         backgroundColor: "var(--active-line)",
