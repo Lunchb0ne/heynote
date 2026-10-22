@@ -37,3 +37,5 @@ Use `agent-browser` to drive the real Electron app (skills: `agent-browser skill
 - Prefer `wait --text/--url/--fn` over fixed sleeps; avoid `networkidle`.
 - CodeMirror notes: `fill` may not work; use `agent-browser keyboard type` / `keyboard inserttext`. To edit document text programmatically, get the view via `document.querySelector('.cm-editor').cmView.view` (not `.cm-content.cmView`) and `view.dispatch({changes: ...})`. Read text with `document.querySelector('.cm-content').innerText`.
 - Screenshots: `screenshot --if-changed` for repeats; `--annotate` maps labels to refs. Preserve dark mode with `--color-scheme dark`.
+- Never `agent-browser close` a session attached over CDP: it quits the app.
+- CDP screenshots don't include native window effects (macOS vibrancy). To check those, capture the real window with `screencapture -x -o -l <window id>`, setting the `alwaysOnTop` setting first, since a covered window can return a stale frame.
