@@ -198,7 +198,7 @@
     <div :class="{'search-panel':true, expanded:replaceVisible}" @keydown="onKeyDown">
         <button 
             @click="replaceVisible = !replaceVisible"
-            class="expand-button">
+            :class="{'expand-button': true, open: replaceVisible}">
         </button>
         <div class="rows">
             <div class="search">
@@ -297,24 +297,19 @@
         
         .expand-button
             border: none
-            background: url('@/assets/icons/caret-right-alpha50.svg') no-repeat center center
-            background-size: 16px
+            background: transparent
             border-radius: 6px
             cursor: pointer
             width: 22px
             margin-right: 3px
-            +dark-mode
-                background-image: url('@/assets/icons/caret-right-white-alpha50.svg')
+            +disclosure-caret(5px)
+            +press(background-color 120ms ease)
             &:focus-visible
                 outline: none
                 border: 2px solid var(--text-400)
             &:hover
                 background-color: var(--fill-100)
-        &.expanded .expand-button
-            background-image: url('@/assets/icons/caret-down-alpha50.svg')
-            +dark-mode
-                background-image: url('@/assets/icons/caret-down-white-alpha50.svg')
-        
+
         .rows
             display: flex
             flex-direction: column

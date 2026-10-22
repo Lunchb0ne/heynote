@@ -756,8 +756,8 @@
         user-select: none
         font-size: 13px
         line-height: 20px
-        padding: 2px 10px
-        margin: 0 6px
+        padding: 4px 10px
+        margin: 0 8px
         border-radius: 6px
         scroll-margin-top: 36px
         scroll-margin-bottom: 36px
@@ -777,22 +777,10 @@
             &.active
                 background-color: var(--fill-100)
                 color: var(--text)
-            &.scratch
-                font-style: italic
         &.folder
-            background-image: url('@/assets/icons/caret-right.svg')
-            background-size: 12px
-            background-repeat: no-repeat
-            background-position-x: calc(9px + var(--indent-level) * 20px)
-            background-position-y: 6px
-            +dark-mode
-                background-image: url('@/assets/icons/caret-right-white.svg')
+            +disclosure-caret(calc(9px + var(--indent-level) * 20px))
             &:hover
                 background-color: var(--fill-50)
-            &.open
-                background-image: url('@/assets/icons/caret-down.svg')
-                +dark-mode
-                    background-image: url('@/assets/icons/caret-down-white.svg')
             &.drop-target
                 background-color: var(--fill-100)
 
@@ -818,4 +806,6 @@
     .name
         display: block
         position: relative
+        overflow: hidden
+        text-overflow: ellipsis
 </style>

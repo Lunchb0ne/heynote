@@ -59,28 +59,19 @@
 
 <style lang="sass" scoped>
     .folder
-        padding: 3px 6px
+        padding: 5px 6px
         font-size: 13px
-        padding-left: calc(18px + var(--indent-level) * 16px)
+        padding-left: calc(24px + var(--indent-level) * 16px)
         display: flex
-        scroll-margin-top: 5px
-        scroll-margin-bottom: 5px
-        background-image: url('@/assets/icons/caret-right.svg')
-        background-size: 13px
-        background-repeat: no-repeat
-        background-position-y: 5px
-        background-position-x: calc(2px + var(--indent-level) * 16px)
+        align-items: center
+        scroll-margin-top: 6px
+        scroll-margin-bottom: 6px
+        +disclosure-caret(calc(7px + var(--indent-level) * 16px))
         user-select: none
         border-radius: 6px
         color: var(--text)
-        +dark-mode
-            background-image: url('@/assets/icons/caret-right-white.svg')
         &:hover
             background-color: var(--fill-50)
-        &.open
-            background-image: url('@/assets/icons/caret-down.svg')
-            +dark-mode
-                background-image: url('@/assets/icons/caret-down-white.svg')
         &.selected
             background-color: var(--fill-100)
             .new-folder

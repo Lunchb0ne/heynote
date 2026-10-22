@@ -278,8 +278,9 @@
         width: 100%
         overflow-y: auto
         +rc-input
-        border-radius: 8px
-        padding: 4px
+        // concentric with the 6px rows inside: 6px radius + 6px padding
+        border-radius: 12px
+        padding: 6px
         box-sizing: border-box
         text-align: left
         &:focus-within

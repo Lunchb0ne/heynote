@@ -243,21 +243,13 @@
         .buffer
             cursor: pointer
             line-height: 20px
-            padding: 2px 10px 2px 24px
-            position: relative
+            padding: 4px 10px 4px 24px
+            margin: 0 8px
+            border-radius: 6px
             white-space: nowrap
             overflow: hidden
             text-overflow: ellipsis
-            background-image: url('@/assets/icons/caret-right.svg')
-            background-size: 12px
-            background-repeat: no-repeat
-            background-position: 9px 6px
-            +dark-mode
-                background-image: url('@/assets/icons/caret-right-white.svg')
-            &.open
-                background-image: url('@/assets/icons/caret-down.svg')
-                +dark-mode
-                    background-image: url('@/assets/icons/caret-down-white.svg')
+            +disclosure-caret(9px)
             &:hover
                 background-color: var(--fill-50)
             &:focus
@@ -279,7 +271,9 @@
                 display: flex
                 gap: 8px
                 line-height: 20px
-                padding: 2px 10px 2px 34px
+                padding: 4px 10px 4px 34px
+                margin: 0 8px
+                border-radius: 6px
                 white-space: nowrap
                 overflow: hidden
                 position: relative
