@@ -29,7 +29,6 @@
                 "showLeftPanel",
             ]),
             ...mapState(useSettingsStore, [
-                "theme",
                 "settings",
             ]),
             ...mapWritableState(useHeynoteStore, ["openTabs"]),
@@ -121,17 +120,17 @@
     .tab-bar
         app-region: drag
         display: flex
+        align-items: center
         height: var(--tab-bar-height)
-        padding: 0
-        border-bottom: 1px solid var(--border)
-        
+        padding: 0 0 0 8px
+        // no bottom border: the editor fades out under the bar instead (scroll edge, see base.js)
+
         +platform-windows-linux
             padding-right: 140px
         +platform-windows-linux-fullscreen
             padding-right: 0
-        
+
         .scroller
-            margin-top: 4px
             //flex-grow: 1
             //width: 100%
             overflow-x: auto
@@ -141,26 +140,29 @@
                 display: flex
                 list-style: none
                 margin: 0
-                padding: 0
+                // room for the active tab's shadow, which the scroller would clip
+                padding: 4px 0
                 > li.spacer
                     flex-shrink: 0
                     width: 7px
         .button-container
             app-region: drag
             padding-top: 0
-            padding-left: 8px
+            padding-left: 2px
             padding-right: 8px
             display: flex
             align-items: center
+            // same size and corners as a tab
             .add-tab
                 app-region: none
-                width: 20px
-                height: 20px
+                width: 26px
+                height: 26px
                 border: none
                 background: none
-                border-radius: 6px
+                border-radius: 7px
+                opacity: 0.7
                 cursor: pointer
-                transition: background-color 250ms
+                +press(background-color 250ms)
                 background-image: url("@/assets/icons/plus-light.svg")
                 background-repeat: no-repeat
                 background-position: center
@@ -168,9 +170,10 @@
                 +dark-mode
                     background-image: url("@/assets/icons/plus-dark.svg")
                 &:hover
-                    transition: none
-                    background-color: var(--fill-100)
-        
+                    transition-duration: 120ms, 0ms
+                    background-color: var(--fill-50)
+                    opacity: 1
+
         .title
             pointer-events: none
             text-align: center

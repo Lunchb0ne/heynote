@@ -397,8 +397,9 @@
             bottom: 0
             left: 0
 
+        // full height (tab bar included), so the sidebar reads as one column edge to edge
         &.left-panel-visible
-            .main-container .editor-container .editor
+            .main-container .editor-container
                 border-left: 1px solid var(--border)
         &.tab-bar-visible
             .main-container .editor-container .editor

@@ -10,19 +10,7 @@
             "active",
             "path",
         ],
-        data() {
-            return {
-                textWidth: 0,
-            }
-        },
-        mounted: function() {
-            this.measureTextWidth()
-        },
         watch: {
-            title() {
-                this.measureTextWidth()
-            },
-
             active: {
                 handler(isActive) {
                     if (isActive) {
@@ -44,26 +32,10 @@
                 return [
                     "tab-item",
                     ...(this.active ? ["active"] : []),
-                    ...[this.textWidth > 120 ? "long" : "short"],
                 ]
             },
         },
         methods: {
-            measureTextWidth() {
-                // measure the width of the tab which we use to give it either the "short" or "long" class
-                const temp = document.createElement('span')
-                temp.style.visibility = 'hidden'
-                temp.style.position = 'absolute'
-                temp.style.whiteSpace = 'nowrap'
-                temp.style.padding = window.getComputedStyle(this.$el).padding
-                temp.style.font = window.getComputedStyle(this.$el).font
-                temp.textContent = this.$el.textContent
-                document.body.appendChild(temp)
-                this.textWidth = temp.offsetWidth
-                document.body.removeChild(temp)
-                //console.log("textWidth:", this.textWidth)
-            },
-
             onClose() {
                 this.heynoteStore.closeTab(this.path)
             },
@@ -89,41 +61,56 @@
 </template>
 
 <style lang="sass" scoped>
+    // tabs sized to their names. The active one is a raised chip (lit top edge, hairline, soft shadow);
+    // hairlines separate the others, and give way next to the active or hovered tab. The close button
+    // sits in the leading padding, Safari style: always on the active tab, on hover for the rest.
     li
         position: relative
-        height: 22px
-        line-height: 22px
-        margin-right: 2px
-        padding: 0 20px
+        height: 26px
+        line-height: 26px
+        margin-right: 3px
+        padding: 0 22px
         cursor: pointer
-        border-radius: 6px
+        border-radius: 7px
         user-select: none
         color: var(--text-600)
-        overflow: hidden
-        flex-grow: 0
-        flex-shrink: 1
-        flex-basis: auto
-        min-width: 84px
+        flex: 0 1 auto
+        min-width: 48px
+        max-width: 220px
+        box-sizing: border-box
         text-align: center
-        transition: background-color 150ms
-        &.short
-            width: 120px
-        &.long
-            width: max-content
-            max-width: 300px
+        transition: background-color 150ms ease, color 150ms ease, box-shadow 150ms ease
+        --chip-bg: rgb(255 255 255 / 0.75)
+        --chip-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.08), 0 1px 2px rgb(0 0 0 / 0.08), 0 1px 1px rgb(0 0 0 / 0.04)
+        +dark-mode
+            --chip-bg: var(--fill-100)
+            --chip-shadow: inset 0 0.5px 0 rgb(255 255 255 / 0.12), 0 0 0 0.5px rgb(255 255 255 / 0.08), 0 1px 3px rgb(0 0 0 / 0.25)
+        & + li::before
+            content: ""
+            position: absolute
+            left: -2px
+            top: 7px
+            height: 12px
+            width: 1px
+            background: var(--border)
+            transition: opacity 150ms ease
+        &.active::before, &.active + li::before, &:hover::before, &:hover + li::before
+            opacity: 0
         &:hover
             background: var(--fill-50)
             color: var(--text)
-            transition: none
-            .close
-                display: block
+            transition-duration: 0ms
+        &:hover .close, &.active .close
+            opacity: 1
+            pointer-events: auto
         &.active
-            background: var(--fill-100)
+            background: var(--chip-bg)
+            box-shadow: var(--chip-shadow)
             color: var(--text)
-            transition: none
             .blurred &
                 color: var(--text-600)
-        
+                box-shadow: none
+
         .title
             display: inline-block
             vertical-align: top
@@ -132,10 +119,11 @@
             text-overflow: ellipsis
             overflow: hidden
         .close
-            display: none
+            opacity: 0
+            pointer-events: none
             position: absolute
-            right: 3px
-            top: 3px
+            left: 4px
+            top: 5px
             width: 16px
             height: 16px
             background: none
@@ -147,6 +135,7 @@
             background-position: center center
             border-radius: 4px
             cursor: pointer
+            +press(opacity 120ms ease)
             +dark-mode
                 background-image: url(@/assets/icons/close-dark.svg)
             &:hover

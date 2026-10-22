@@ -11,9 +11,14 @@ export const heynoteBase = EditorView.theme({
         color: "var(--text)",
         backgroundColor: "transparent",
     },
+    // scroll edge: text fades out as it scrolls under the tab bar, in place of a border. 10px is the
+    // content's top padding, so nothing fades at rest
+    ".cm-scroller": {
+        maskImage: "linear-gradient(transparent, #000 10px)",
+    },
     ".cm-content": {
         caretColor: "var(--text)",
-        paddingTop: 4,
+        paddingTop: '10px',
     },
     ".cm-cursor, .cm-dropCursor": {
         borderLeftColor: "var(--text)",
