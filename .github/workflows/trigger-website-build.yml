@@ -9,6 +9,7 @@ on:
 
 jobs:
   trigger:
+    if: github.repository_owner == 'heyman'
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Website Build

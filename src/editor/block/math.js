@@ -3,6 +3,7 @@ import { Decoration } from "@codemirror/view"
 import { RangeSetBuilder } from "@codemirror/state"
 import { WidgetType } from "@codemirror/view"
 import { foldState } from "@codemirror/language"
+import { parser as createMathParser, format as formatMath } from "mathjs"
 
 import { getNoteBlockFromPos } from "./block"
 import { transactionsHasAnnotation, CURRENCIES_LOADED } from "../annotation"
@@ -69,7 +70,7 @@ function mathDeco(view) {
                         pos = block.content.from
                         continue
                     }
-                    parser = window.math.parser()
+                    parser = createMathParser()
                     mathParsers.set(block, {parser, prev})
                 }
                 
@@ -101,12 +102,12 @@ function mathDeco(view) {
                     }
                     if (resultWidget === undefined) {
                         resultWidget = new MathResult(
-                            math.format(result, {
+                            formatMath(result, {
                                 precision: 8,
                                 upperExp: 8,
                                 lowerExp: -6,
                             }),
-                            math.format(result, {
+                            formatMath(result, {
                                 notation: "fixed",
                             })
                         )

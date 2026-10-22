@@ -4,7 +4,6 @@ import { join } from 'node:path'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import electron from 'vite-plugin-electron'
-import renderer from 'vite-plugin-electron-renderer'
 import license from 'rollup-plugin-license'
 import pkg from './package.json'
 import path from 'path'
@@ -57,7 +56,12 @@ const resolveConfig = {
 
 // https://vitejs.dev/config/
 export default defineConfig({
+	base: './',
 	resolve: resolveConfig,
+	build: {
+		cssCodeSplit: false,
+		assetsDir: '',
+	},
 
 	plugins: [
 		vue(),
@@ -125,10 +129,6 @@ export default defineConfig({
 				},
 			}
 		]),
-		// Use Node.js API in the Renderer-process
-		renderer({
-			nodeIntegration: false, // turning this on will break Math.js
-		}),
 
 		// Add license header to the built files
 		license({thirdParty: {

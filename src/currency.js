@@ -1,3 +1,5 @@
+import { createUnit, unit } from "mathjs"
+
 let currenciesLoaded = false
 export async function loadCurrencies() {
     let data
@@ -8,14 +10,14 @@ export async function loadCurrencies() {
         return false
     }
     if (!currenciesLoaded)
-        math.createUnit(data.base, {override:currenciesLoaded, aliases:[data.base.toLowerCase()]})
+        createUnit(data.base, {override:currenciesLoaded, aliases:[data.base.toLowerCase()]})
     Object.keys(data.rates)
         .filter(function (currency) {
             return currency !== data.base
         })
         .forEach(function (currency) {
-            math.createUnit(currency, {
-                definition: math.unit(1 / data.rates[currency], data.base),
+            createUnit(currency, {
+                definition: unit(1 / data.rates[currency], data.base),
                 aliases: currency === "CUP" ? [] : [currency.toLowerCase()], // Lowercase CUP clashes with the measurement unit cup
             }, {override: currenciesLoaded})
         })
