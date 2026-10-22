@@ -1,5 +1,5 @@
 <script>
-    import { mapState, mapStores, mapWritableState } from "pinia"
+    import { mapStores, mapWritableState } from "pinia"
 
     import { useHeynoteStore } from "@/src/stores/heynote-store"
     import { useSettingsStore } from "@/src/stores/settings-store"
@@ -35,14 +35,8 @@
         },
 
         computed: {
-            ...mapState(useHeynoteStore, [
-                "isFocused",
-            ]),
             ...mapWritableState(useHeynoteStore, [
                 "currentLeftPanel",
-            ]),
-            ...mapState(useSettingsStore, [
-                "theme",
             ]),
             ...mapStores(useHeynoteStore, useSettingsStore),
 
@@ -153,33 +147,60 @@
             flex-grow: 1
             min-height: 0
 
+        // segmented control
         .left-panel-tab-buttons
             app-region: none
-            padding: 4px
-            gap: 4px
+            margin: 6px 8px
+            padding: 2px
+            gap: 2px
             display: flex
             align-items: center
-            width: 100%
             box-sizing: border-box
-            border-top: 1px solid var(--border)
+            background: var(--fill-50)
+            border-radius: 8px
+            position: relative
+            // the selected pill is one element that slides between the two halves
+            &::before
+                content: ""
+                position: absolute
+                top: 2px
+                bottom: 2px
+                left: 2px
+                width: calc((100% - 6px) / 2)
+                border-radius: 6px
+                background-color: var(--fill-100)
+                box-shadow: 0 1px 2px rgb(0 0 0 / 0.12)
+                transition: transform 220ms var(--ease-out)
+            &:has(button.selected:last-child)::before
+                transform: translateX(calc(100% + 2px))
+            @media (prefers-reduced-motion: reduce)
+                &::before
+                    transition: none
             button
+                position: relative
+                +press(color 150ms ease)
                 flex: 1
+                display: flex
+                align-items: center
+                justify-content: center
+                white-space: nowrap
+                min-width: 0
+                height: 22px
                 background: none
                 border: none
                 border-radius: 6px
-                padding: 4px 8px
+                padding: 0 8px
                 color: var(--text-600)
                 cursor: pointer
                 font-size: 12px
+                font-weight: 500
                 &:focus
                     outline: none
                 &:focus-visible
                     box-shadow: inset 0 0 0 2px var(--text-400)
                 &:hover
-                    background-color: var(--fill-50)
                     color: var(--text)
                 &.selected
-                    background-color: var(--fill-100)
                     color: var(--text)
                 .icon
                     display: inline-block
@@ -187,18 +208,14 @@
                     height: 12px
                     background-size: 100%
                     background-repeat: no-repeat
+                    flex-shrink: 0
                     margin-right: 5px
-                    position: relative
-                    top: 1px
                     &.buffers
                         background-image: url('@/assets/icons/files-light.svg')
                         +dark-mode
                             background-image: url('@/assets/icons/files-dark.svg')
                     &.search
                         background-image: url('@/assets/icons/search-light.svg')
-                        width: 13px
-                        height: 13px
-                        top: 2px
                         +dark-mode
                             background-image: url('@/assets/icons/search-dark.svg')
         
