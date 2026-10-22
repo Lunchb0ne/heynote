@@ -125,10 +125,11 @@
         z-index: 400 // above the search panel which have z-index 300
         font-size: 13px
         position: absolute
-        top: 8px
+        top: 12px
         left: 50%
         transform: translateX(-50%)
-        max-height: calc(100% - 16px)
+        // 12px clear of the tab bar and of the status bar
+        max-height: calc(100% - 24px - var(--status-bar-height))
         box-sizing: border-box
         display: flex
         flex-direction: column
@@ -137,19 +138,20 @@
 
         input
             +rc-palette-input
-            padding: 12px
+            padding: 18px 18px
             border-bottom: 1px solid var(--border)
-            width: 320px
+            width: 380px
             +webapp-mobile
                 font-size: 16px
                 max-width: 100%
         
         .items
             overflow-y: auto
-            padding: 6px
+            padding: 8px
             > li
                 border-radius: 8px
-                padding: 5px 10px
+                padding: 7px 12px
+                line-height: 20px
                 cursor: pointer
                 color: var(--text)
                 &:hover

@@ -153,6 +153,13 @@
                 "executeCommand",
             ]),
 
+            // key names from the keymap shown as key glyphs ("Cmd+Enter" -> ⌘ ↩); modifier glyphs on macOS only
+            keyCaps(binding) {
+                const glyphs = {Enter: "↩", Backspace: "⌫", ArrowUp: "↑", ArrowDown: "↓", ArrowLeft: "←", ArrowRight: "→",
+                    ...(window.heynote.platform.isMac ? {Cmd: "⌘", Ctrl: "⌃", Alt: "⌥", Shift: "⇧"} : {})}
+                return binding.split(/\+(?=.)/).map(key => glyphs[key] || key)
+            },
+
             buildItems() {
                 //console.log("buildItems", Object.entries(this.buffers))
                 this.items = Object.entries(this.buffers).map(([path, metadata]) => {
@@ -330,7 +337,7 @@
                                 v-for="binding in item.bindings.slice(0, 2)" 
                                 :key="binding" 
                                 class="binding"
-                            > {{ binding }}</span>
+                            ><kbd v-for="key, i in keyCaps(binding)" :key="i">{{ key }}</kbd></span>
                             <span v-if="item.bindings.length > 2" class="more">
                                 and {{ item.bindings.length - 2 }} more
                             </span>
@@ -371,11 +378,13 @@
         +rc-popover
         font-size: 13px
         position: absolute
-        top: 8px
+        top: 12px
         left: 50%
-        width: 480px
+        width: 560px
+        max-width: calc(100% - 48px)
         transform: translateX(-50%)
-        max-height: calc(100% - 16px)
+        // 12px clear of the tab bar and of the status bar
+        max-height: calc(100% - 24px - var(--status-bar-height))
         box-sizing: border-box
         display: flex
         flex-direction: column
@@ -384,14 +393,14 @@
             max-width: calc(100% - 80px)
 
         .input-container
-            padding: 6px 8px
+            padding: 10px 12px
             border-bottom: 1px solid var(--border)
             h1
                 font-weight: bold
-                margin-bottom: 14px
+                margin: 4px 6px 10px
             input
                 +rc-palette-input
-                padding: 6px 4px
+                padding: 8px 6px
                 width: 100%
                 +webapp-mobile
                     font-size: 16px
@@ -399,18 +408,18 @@
         
         .scroller
             overflow-y: auto
-            padding: 6px
-        
+            padding: 8px
+
         .items
             > li.line-separator
                 height: 1px
                 background: var(--border)
-                margin: 4px -6px
+                margin: 6px -8px
             > li.item
                 position: relative
                 border-radius: 8px
-                padding: 5px 10px
-                line-height: 18px
+                padding: 7px 12px
+                line-height: 20px
                 color: var(--text)
                 display: flex
                 align-items: center
@@ -457,17 +466,28 @@
                     ::v-deep(b)
                         font-weight: 700
                 .bindings
-                    opacity: 0.6
-                    font-size: 12px
+                    color: var(--text-600)
+                    font-size: 11px
                     flex-shrink: 1
                     overflow: hidden
                     text-overflow: ellipsis
                     text-wrap: nowrap
                     .binding
-                        display: inline-block
-                        margin-right: 10px
+                        display: inline-flex
+                        gap: 3px
+                        margin-right: 12px
                         &:last-child
                             margin-right: 0
+                    kbd
+                        font-family: var(--system-font)
+                        min-width: 18px
+                        height: 18px
+                        line-height: 18px
+                        padding: 0 5px
+                        box-sizing: border-box
+                        text-align: center
+                        border-radius: 5px
+                        background: var(--fill-100)
                     .more
                         font-style: italic
                     

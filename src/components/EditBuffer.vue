@@ -212,9 +212,10 @@
     .new-note
         +rc-popover
         font-size: 13px
-        width: 420px
+        width: 460px
+        max-width: calc(100% - 48px)
         position: absolute
-        top: calc(var(--tab-bar-height) + 8px)
+        top: calc(var(--tab-bar-height) + 12px)
         left: 50%
         transform: translateX(-50%)
         display: flex
@@ -226,18 +227,19 @@
             max-width: calc(100% - 80px)
         
         .container
-            padding: 12px
+            padding: 18px 18px 8px
             min-height: 0
             display: flex
             flex-direction: column
 
             h1
+                font-size: 14px
                 font-weight: 600
-                margin-bottom: 14px
-            
+                margin-bottom: 16px
+
             label
                 display: block
-                margin-bottom: 6px
+                margin-bottom: 8px
                 font-size: 12px
                 font-weight: 500
                 color: var(--text-600)
@@ -245,9 +247,11 @@
             .name-input
                 +rc-input
                 width: 100%
-                padding: 6px 8px
+                height: 32px
+                padding: 0 10px
+                font-size: 13px
                 box-sizing: border-box
-                margin-bottom: 16px
+                margin-bottom: 18px
                 +webapp-mobile
                     font-size: 16px
                     max-width: 100%
@@ -255,14 +259,14 @@
         .bottom-bar
             border-top: 1px solid var(--border)
             background: var(--fill-25)
-            padding: 8px 12px
+            padding: 12px 18px
             display: flex
             justify-content: space-between
             button
                 +rc-button
                 &[type="submit"]
+                    +rc-button-primary
                     order: 1
-                    font-weight: 600
                 &.cancel
                     order: 0
                     background: transparent
