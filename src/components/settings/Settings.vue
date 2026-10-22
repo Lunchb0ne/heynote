@@ -650,6 +650,9 @@
                     select
                         +rc-select
                         margin: 2px 0
+                    // on/off settings are switches; the hotkey modifiers (KeyboardHotkey) stay checkboxes
+                    input[type=checkbox]
+                        +rc-switch
                     .row
                         display: flex
                         .entry
@@ -666,17 +669,16 @@
                                 &:focus
                                     outline: none
                             label
-                                display: block
+                                display: flex
+                                align-items: center
+                                gap: 10px
+                                min-height: 26px
                                 user-select: none
                                 &.keyboard-shortcut-label
-                                    margin-bottom: 14px
-                                > input[type=checkbox]
-                                    position: relative
-                                    top: 2px
-                                    left: -3px
+                                    margin-bottom: 10px
                         &.font-settings
                             display: flex
-                            .font-family
+                            .font-family, .ui-font-family
                                 width: 280px
                             .font-size
                                 width: 120px

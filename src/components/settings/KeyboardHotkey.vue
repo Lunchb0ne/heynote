@@ -157,23 +157,26 @@
 <style lang="sass" scoped>
     .keyboard-hotkey
         display: flex
-        padding: 7px
-        border-radius: 3px
-        border: 1px solid #c4c4c4
-        background: #eee
-        +dark-mode
-            border: 1px solid #666
-            background: #555
+        align-items: center
+        gap: 14px
+        padding: 8px 12px
+        border-radius: 8px
+        border: 1px solid var(--border)
+        background: var(--fill-25)
+        transition: opacity 150ms ease
 
         &.disabled
-            opacity: 0.3
+            opacity: 0.4
 
         .modifier
-            margin-right: 5px
+            display: flex
+            align-items: center
+            gap: 6px
             user-select: none
-            .text
-                position: relative
-                top: -2px
+            input
+                +rc-checkbox
         select
-            margin-right: 5px
+            +rc-select
+            margin-left: auto
+            width: 140px
 </style>
