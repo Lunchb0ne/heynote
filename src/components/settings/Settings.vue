@@ -635,7 +635,7 @@
             left: 50%
             top: 50%
             transform: translate(-50%, -50%)
-            +dialog-enter(translate(-50%, -50%))
+            +dialog-enter
             width: 820px
             height: var(--dialog-height)
             max-width: 100%
@@ -710,9 +710,6 @@
                                 > button
                                     +rc-button
                                     flex-shrink: 0
-                                    &:disabled
-                                        cursor: default
-                                        opacity: 0.4
                                 .path
                                     flex-grow: 1
                                     margin-left: 10px

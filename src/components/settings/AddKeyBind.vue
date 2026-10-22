@@ -153,7 +153,7 @@
             top: 50%
             left: 50%
             transform: translate(-50%, -50%)
-            +dialog-enter(translate(-50%, -50%))
+            +dialog-enter
             display: flex
             flex-direction: column
             background: #fff

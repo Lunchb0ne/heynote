@@ -283,7 +283,4 @@
         padding: 6px
         box-sizing: border-box
         text-align: left
-        &:focus-within
-            border-color: var(--border-200)
-            background: var(--fill-100)
 </style>

@@ -375,20 +375,9 @@
 
 <style scoped lang="sass">
     .note-selector
-        +rc-popover
-        font-size: 13px
-        position: absolute
-        top: 12px
-        left: 50%
+        +rc-palette
         width: 560px
         max-width: calc(100% - 48px)
-        transform: translateX(-50%)
-        // 12px clear of the tab bar and of the status bar
-        max-height: calc(100% - 24px - var(--status-bar-height))
-        box-sizing: border-box
-        display: flex
-        flex-direction: column
-        z-index: 400 // above the search panel which have z-index 300
         +webapp-mobile
             max-width: calc(100% - 80px)
 
@@ -416,30 +405,21 @@
                 background: var(--border)
                 margin: 6px -8px
             > li.item
+                +rc-palette-item
                 position: relative
-                border-radius: 8px
-                padding: 7px 12px
-                line-height: 20px
-                color: var(--text)
                 display: flex
                 align-items: center
                 scroll-margin-top: 6px
                 scroll-margin-bottom: 6px
-                cursor: pointer
-                &:hover
-                    background: var(--fill-50)
+                &:hover, &.selected
                     .action-buttons .show-actions
                         display: inline-block
                 .action-buttons button
                     color: var(--text)
-                &.selected
-                    background: var(--fill-100)
-                    &.action-buttons-visible
-                        background: none
-                        box-shadow: inset 0 0 0 1px var(--border-200)
-                        color: var(--text-600)
-                    .action-buttons .show-actions
-                        display: inline-block
+                &.selected.action-buttons-visible
+                    background: none
+                    box-shadow: inset 0 0 0 1px var(--border-200)
+                    color: var(--text-600)
                 &.scratch
                     font-weight: 600
                 &.new-note

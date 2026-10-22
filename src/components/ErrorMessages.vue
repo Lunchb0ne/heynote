@@ -76,7 +76,7 @@
             left: 50%
             top: 50%
             transform: translate(-50%, -50%)
-            +dialog-enter(translate(-50%, -50%))
+            +dialog-enter
             width: 440px
             height: 200px
             max-width: 100%

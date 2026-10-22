@@ -121,20 +121,7 @@
 
 <style scoped lang="sass">    
     .language-selector
-        +rc-popover
-        z-index: 400 // above the search panel which have z-index 300
-        font-size: 13px
-        position: absolute
-        top: 12px
-        left: 50%
-        transform: translateX(-50%)
-        // 12px clear of the tab bar and of the status bar
-        max-height: calc(100% - 24px - var(--status-bar-height))
-        box-sizing: border-box
-        display: flex
-        flex-direction: column
-        +webapp-mobile
-            max-width: calc(100% - 80px)
+        +rc-palette
 
         input
             +rc-palette-input
@@ -149,15 +136,7 @@
             overflow-y: auto
             padding: 8px
             > li
-                border-radius: 8px
-                padding: 7px 12px
-                line-height: 20px
-                cursor: pointer
-                color: var(--text)
-                &:hover
-                    background: var(--fill-50)
-                &.selected
-                    background: var(--fill-100)
+                +rc-palette-item
                 ::v-deep(b)
                     font-weight: 700
 </style>
