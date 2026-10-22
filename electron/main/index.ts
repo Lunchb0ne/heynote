@@ -212,7 +212,8 @@ async function createWindow() {
             contextIsolation: true,
         },
         titleBarStyle: "hidden" as const, // customButtonsOnHover
-        trafficLightPosition: { x: 8, y: 8 },
+        // centred in the 40px mac title row (--tab-bar-height), inset like native macOS toolbars
+        trafficLightPosition: { x: 16, y: 14 },
         ...(!isMac ? {
             titleBarOverlay: {
                 color: windowBg(),

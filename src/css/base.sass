@@ -24,6 +24,10 @@
     // motion: strong ease-out for anything the user triggers (see press / dialog-enter in include.sass)
     --ease-out: cubic-bezier(0.23, 1, 0.32, 1)
 
+// macOS: a roomier unified title row (traffic lights are placed to match in electron/main)
+html[platform=mac]
+    --tab-bar-height: 40px
+    --status-bar-height: 30px
 
 :root[theme='light']
     --bg-rgb: 255 255 255
