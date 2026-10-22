@@ -158,6 +158,8 @@ function wasOpenedAtLogin() {
 }
 
 const windowBg = () => nativeTheme.shouldUseDarkColors ? TITLE_BAR_BG_DARK : TITLE_BAR_BG_LIGHT
+// Windows/Linux window controls, drawn over the tab bar
+const titleBarOverlay = () => ({ color: windowBg(), symbolColor: nativeTheme.shouldUseDarkColors ? '#aaa' : '#333' })
 
 async function createWindow() {
     // read any stored window settings from config, or use defaults
@@ -192,7 +194,6 @@ async function createWindow() {
         title: 'heynote',
         icon,
         backgroundColor: windowBg(),
-        ...(isMac && CONFIG.get("settings.translucentWindow") ? { vibrancy: "under-window" as const, backgroundColor: "#00000000" } : {}),
         accentColor: undefined,
         // keep vibrancy (translucent window setting) when the window isn't focused, instead of going flat grey
         visualEffectState: "active" as const,
@@ -214,13 +215,9 @@ async function createWindow() {
         titleBarStyle: "hidden" as const, // customButtonsOnHover
         // centred in the 40px mac title row (--tab-bar-height), inset like native macOS toolbars
         trafficLightPosition: { x: 16, y: 14 },
-        ...(!isMac ? {
-            titleBarOverlay: {
-                color: windowBg(),
-                symbolColor: nativeTheme.shouldUseDarkColors ? '#aaa' : '#333',
-            }, 
-        } : {})
+        ...(!isMac ? { titleBarOverlay: titleBarOverlay() } : {})
     }, windowBounds))
+    registerTranslucentWindow()
 
     win.on("maximize", () => {
         currentWindowIsMaximized = true
@@ -538,10 +535,7 @@ ipcMain.handle('dark-mode:set', (event, mode) => {
 
     // update titleBarOverlay colors on Windows/Linux
     if (!isMac) {
-        win?.setTitleBarOverlay({
-            color: windowBg(),
-            symbolColor: nativeTheme.shouldUseDarkColors ? '#aaa' : '#333',
-        })
+        win?.setTitleBarOverlay(titleBarOverlay())
     }
 })
 
