@@ -1,6 +1,6 @@
 import { ViewPlugin, EditorView, Decoration, WidgetType, lineNumbers, GutterMarker, lineNumberMarkers } from "@codemirror/view"
 import { layer, RectangleMarker } from "@codemirror/view"
-import { EditorState, RangeSetBuilder, StateField, RangeSet, Transaction} from "@codemirror/state";
+import { EditorState, EditorSelection, RangeSetBuilder, StateField, RangeSet, Transaction} from "@codemirror/state";
 import { syntaxTreeAvailable } from "@codemirror/language"
 import { useHeynoteStore } from "../../stores/heynote-store.js"
 import { heynoteEvent, LANGUAGE_CHANGE, CURSOR_CHANGE, SET_CONTENT, UPDATE_CREATED, ADD_NEW_BLOCK } from "../annotation.js";
@@ -269,6 +269,63 @@ const focusBand = layer({
     class: "heynote-focus-band-layer",
 })
 
+// a selection rectangle from pos (the end of a line) to the right edge of the text, on the line's last
+// row. Layer markers are positioned relative to the scroller's scrolled origin
+function lineTailMarker(view, pos) {
+    const caret = view.coordsAtPos(pos)
+    if (!caret) {
+        return null
+    }
+    const scroller = view.scrollDOM.getBoundingClientRect()
+    const right = view.contentDOM.getBoundingClientRect().right -
+        parseFloat(getComputedStyle(view.contentDOM.querySelector(".cm-line")).paddingRight)
+    const line = view.lineBlockAt(pos)
+    const top = view.documentTop + line.bottom - view.defaultLineHeight
+    return new RectangleMarker(
+        "cm-selectionBackground",
+        caret.left - scroller.left + view.scrollDOM.scrollLeft,
+        top - scroller.top + view.scrollDOM.scrollTop,
+        Math.max(0, right - caret.left),
+        view.defaultLineHeight,
+    )
+}
+
+// The selection, drawn block by block. CodeMirror's own selection layer (hidden in base.js) draws a
+// range as one shape, which paints over the gaps and dividers between blocks; this cuts it at each
+// block's text, so a selection spanning blocks reads as a selection in each of them.
+const blockSelection = layer({
+    above: false,
+    markers(view) {
+        const blocks = view.state.field(blockState)
+        const markers = []
+        for (const range of view.state.selection.ranges) {
+            if (range.empty) {
+                continue
+            }
+            for (const block of blocks) {
+                const from = Math.max(range.from, block.content.from)
+                const to = Math.min(range.to, block.content.to)
+                if (from < to) {
+                    markers.push(...RectangleMarker.forRange(view, "cm-selectionBackground", EditorSelection.range(from, to)))
+                }
+                // the selection runs on past this block: carry its last line to the right edge, as a
+                // selected line break would (this also marks empty lines and empty blocks as selected)
+                if (range.from <= block.content.to && range.to > block.content.to) {
+                    const tail = lineTailMarker(view, block.content.to)
+                    if (tail) {
+                        markers.push(tail)
+                    }
+                }
+            }
+        }
+        return markers
+    },
+    update(update) {
+        return update.docChanged || update.selectionSet || update.viewportChanged
+    },
+    class: "heynote-selection-layer",
+})
+
 class ActiveBlockGutterMarker extends GutterMarker {
     elementClass = "heynote-active-block-gutter"
 }
@@ -519,6 +576,7 @@ export const noteBlockExtension = (editor) => {
         atomicNoteBlock,
         blockLayer,
         focusBand,
+        blockSelection,
         activeBlockGutter,
         preventFirstBlockFromBeingDeleted,
         preventSelectionBeforeFirstBlock,

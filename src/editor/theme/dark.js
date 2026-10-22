@@ -3,19 +3,7 @@ import { syntaxHighlighting } from '@codemirror/language';
 
 import { raycastHighlightStyle } from "./base.js";
 
-const selection = "rgb(86 194 255 / 0.28)";
-const selectionBlur = "rgb(255 255 255 / 0.1)";
-
 const darkTheme = EditorView.theme({
-    '.cm-selectionBackground': {
-        backgroundColor: selectionBlur,
-    },
-    '&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground': {
-        backgroundColor: selection,
-    },
-    '.cm-activeLine.heynote-empty-block-selected': {
-        "background-color": selection,
-    },
     '.cm-highlightSpace': {
         'background-image': 'radial-gradient(circle at 50% 54%, #aaaaaa40 11%, transparent 5%)',
     },
@@ -33,7 +21,6 @@ const darkHighlightStyle = raycastHighlightStyle({
     function: "#73DFA5",
     number: "#7A7FFD",
     punctuation: "#FF659C",
-    deleted: "#FF605E",
 })
 
 const heynoteDark = [

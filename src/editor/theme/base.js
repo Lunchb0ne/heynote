@@ -46,6 +46,12 @@ export const heynoteBase = EditorView.theme({
         backgroundColor: "var(--active-line)",
         pointerEvents: "none",
     },
+    // the selection is drawn block by block (blockSelection in block.js) in place of CodeMirror's layer
+    ".cm-selectionLayer": { display: "none" },
+    ".cm-selectionBackground": { backgroundColor: "var(--selection-blur)" },
+    "&.cm-focused > .cm-scroller > .heynote-selection-layer .cm-selectionBackground, .cm-activeLine.heynote-empty-block-selected": {
+        backgroundColor: "var(--selection)",
+    },
     ".cm-selectionMatch": { backgroundColor: "var(--fill-100)" },
     "&.cm-focused .cm-matchingBracket": {
         backgroundColor: "var(--fill-100)",
@@ -313,8 +319,8 @@ export function raycastHighlightStyle(c) {
         { tag: [tags.operator, tags.separator, tags.angleBracket], color: c.punctuation },
         { tag: [tags.paren, tags.brace, tags.squareBracket, tags.contentSeparator], color: "var(--text-600)" },
         { tag: [tags.link, tags.url], color: c.punctuation, textDecoration: "underline", textUnderlinePosition: "under" },
-        { tag: tags.deleted, color: c.deleted },
-        { tag: tags.invalid, color: c.deleted, textDecoration: "underline wavy" },
+        { tag: tags.deleted, color: "#FF605E" },
+        { tag: tags.invalid, color: "#FF605E", textDecoration: "underline wavy" },
         { tag: tags.heading, fontWeight: "bold" },
         { tag: tags.strong, fontWeight: "bold" },
         { tag: tags.emphasis, fontStyle: "italic" },
