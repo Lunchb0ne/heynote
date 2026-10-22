@@ -53,6 +53,7 @@
                 showInDock: this.initialSettings.showInDock,
                 showInMenu: this.initialSettings.showInMenu,
                 alwaysOnTop: this.initialSettings.alwaysOnTop,
+                translucentWindow: this.initialSettings.translucentWindow ?? false,
                 openAtLogin: this.initialSettings.openAtLogin,
                 startHidden: this.initialSettings.startHidden ?? false,
                 bracketClosing: this.initialSettings.bracketClosing,
@@ -141,6 +142,7 @@
                     showInDock: this.showInDock,
                     showInMenu: this.showInMenu || !this.showInDock,
                     alwaysOnTop: this.alwaysOnTop,
+                    translucentWindow: this.translucentWindow,
                     openAtLogin: this.openAtLogin,
                     startHidden: this.startHidden,
                     autoUpdate: this.autoUpdate,
@@ -378,6 +380,14 @@
                                     <option :selected="theme === 'light'" value="light">Light</option>
                                     <option :selected="theme === 'dark'" value="dark">Dark</option>
                                 </select>
+                                <label v-if="isMac && !isWebApp">
+                                    <input
+                                        type="checkbox"
+                                        v-model="translucentWindow"
+                                        @change="updateSettings"
+                                    />
+                                    Translucent window
+                                </label>
                             </div>
                         </div>
                         <div class="row">

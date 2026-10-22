@@ -1,4 +1,4 @@
-import { toRaw } from "vue"
+import { toRaw, watch } from "vue"
 import { defineStore } from "pinia"
 
 import { SETTINGS_CHANGE_EVENT } from "@/src/common/constants"
@@ -64,6 +64,10 @@ export const useSettingsStore = defineStore("settings", {
                 }
             }
             onThemeChange(window.heynote.themeMode.initial)
+            // vibrancy is macOS only (see registerTranslucentWindow in the main process)
+            watch(() => this.settings.translucentWindow, (translucent) => {
+                document.documentElement.toggleAttribute("translucent", window.heynote.platform.isMac && translucent === true)
+            }, {immediate: true})
             window.heynote.themeMode.onChange(onThemeChange)
         },
 

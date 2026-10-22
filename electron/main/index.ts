@@ -194,6 +194,8 @@ async function createWindow() {
         backgroundColor: windowBg(),
         ...(isMac && CONFIG.get("settings.translucentWindow") ? { vibrancy: "under-window" as const, backgroundColor: "#00000000" } : {}),
         accentColor: undefined,
+        // keep vibrancy (translucent window setting) when the window isn't focused, instead of going flat grey
+        visualEffectState: "active" as const,
         show: !hideOnStartup,
         // We can't set fullscreen:true when hideOnStartup is true, because it will cancel out the show:false option
         // instead we fullscreen the window the first time it is shown
@@ -444,6 +446,15 @@ function registerOpenAtLogin() {
     } : { openAtLogin })
 }
 
+function registerTranslucentWindow() {
+    if (!isMac || !win) {
+        return
+    }
+    const translucent = CONFIG.get("settings.translucentWindow")
+    win.setVibrancy(translucent ? "under-window" : null)
+    win.setBackgroundColor(translucent ? "#00000000" : windowBg())
+}
+
 function registerAlwaysOnTop() {
     if (CONFIG.get("settings.alwaysOnTop")) {
         const setAlwaysOnTop = () => {
@@ -670,6 +681,7 @@ ipcMain.handle('settings:set', async (event, settings) => {
     let showInMenuChanged = settings.showInMenu !== CONFIG.get("settings.showInMenu");
     let bufferPathChanged = settings.bufferPath !== CONFIG.get("settings.bufferPath");
     let alwaysOnTopChanged = settings.alwaysOnTop !== CONFIG.get("settings.alwaysOnTop");
+    let translucentWindowChanged = settings.translucentWindow !== CONFIG.get("settings.translucentWindow");
     let openAtLoginChanged = settings.openAtLogin !== CONFIG.get("settings.openAtLogin");
     let autoInstallUpdatesChanged = settings.autoInstallUpdates !== CONFIG.get("settings.autoInstallUpdates");
     CONFIG.set("settings", settings)
@@ -687,6 +699,9 @@ ipcMain.handle('settings:set', async (event, settings) => {
     }
     if (alwaysOnTopChanged) {
         registerAlwaysOnTop()
+    }
+    if (translucentWindowChanged) {
+        registerTranslucentWindow()
     }
     if (openAtLoginChanged) {
         registerOpenAtLogin()
