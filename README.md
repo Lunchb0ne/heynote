@@ -3,6 +3,28 @@
 > [!NOTE]
 > This is my personal work-in-progress fork of [heyman/heynote](https://github.com/heyman/heynote). Expect lots of slop but a much prettier UI. For the official app, use the upstream repo.
 
+## About this fork
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/fork-editor-dark.png">
+  <img src="docs/img/fork-editor-light.png" width="851" alt="The redesigned editor with the translucent window">
+</picture>
+
+What the fork adds on top of upstream:
+
+-   A Raycast-style design system: one palette built from the text color, roomier dialogs, palettes and status bar
+-   Translucent window (macOS vibrancy), which goes opaque with "Reduce transparency"
+-   Blocks separated by full-width dividers, with a framed band behind the block holding the cursor
+-   A soft pill on the current line
+-   A quieter line-number gutter that lights up the active block, and a drawn fold chevron
+-   Round task checkboxes that pop and strike through when checked
+-   Switches for on/off settings, segmented Buffers/Search control
+-   Raised chip tabs under one seamless macOS title row
+-   Separate Interface Font and Editor Font settings
+-   Press feedback, dialog fades and other small motion, all off under "Reduce motion"
+
+<img src="docs/img/fork-settings-dark.png" width="851" alt="Settings with switches and the Interface Font setting">
+
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/heyman/heynote)](https://github.com/heyman/heynote/releases)
 [![Build Status](https://github.com/heyman/heynote/workflows/Tests/badge.svg)](https://github.com/heyman/heynote/actions?query=workflow%3ATests)
 
