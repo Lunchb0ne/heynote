@@ -56,6 +56,8 @@
                 draggingBufferPath: null,
                 dragOverFolderPath: null,
                 selectedItemKey: null,
+                // a buffer that just appeared (created, renamed or moved), whose row flashes once
+                arrivedBufferPath: null,
             }
         },
 
@@ -64,6 +66,7 @@
                 this.updateBuffers(),
                 this.refreshDirectoryList(),
             ])
+            this.knownBufferPaths ??= new Set(Object.keys(this.buffers))
             this.syncFolderOpenState()
             this.$nextTick(() => this.scrollActiveBufferIntoView())
             if (this.consumeFocusBufferTreeOnMount()) {
@@ -74,6 +77,7 @@
         },
 
         beforeUnmount() {
+            clearTimeout(this.arrivedTimer)
             if (window._heynote_buffer_tree === this) {
                 window._heynote_buffer_tree = null
             }
@@ -86,6 +90,7 @@
                 handler() {
                     this.refreshDirectoryList()
                     this.syncFolderOpenState()
+                    this.flashArrivedBuffer()
                 },
             },
             currentBufferPath() {
@@ -192,6 +197,20 @@
         },
 
         methods: {
+            // flash the row of a buffer that wasn't in the tree before, so you see where it landed. The
+            // first load (or the sidebar reopening) shows the tree as it is
+            flashArrivedBuffer() {
+                const known = this.knownBufferPaths
+                const paths = Object.keys(this.buffers)
+                this.knownBufferPaths = new Set(paths)
+                const arrived = known?.size ? paths.find(p => !known.has(p)) : null
+                if (arrived) {
+                    this.arrivedBufferPath = arrived
+                    clearTimeout(this.arrivedTimer)
+                    this.arrivedTimer = setTimeout(() => this.arrivedBufferPath = null, 1000)
+                }
+            },
+
             ...mapActions(useHeynoteStore, [
                 "updateBuffers",
                 "openBuffer",
@@ -709,6 +728,7 @@
                     scratch: item.scratch,
                     selected: itemKey(item) === selectedItemKey,
                     'drop-target': item.type === 'folder' && dragOverFolderPath === item.path,
+                    arrived: item.type === 'buffer' && item.path === arrivedBufferPath,
                 }"
                 :style="{ '--indent-level': item.level }"
                 :draggable="item.type === 'buffer' && !item.scratch"
@@ -777,6 +797,8 @@
             &.active
                 background-color: var(--fill-100)
                 color: var(--text)
+            &.arrived
+                animation: buffer-arrived 900ms ease-out
         &.folder
             +disclosure-caret(calc(9px + var(--indent-level) * 20px))
             // eases the drop highlight as a dragged buffer crosses folders
@@ -810,4 +832,9 @@
         position: relative
         overflow: hidden
         text-overflow: ellipsis
+
+    // a just-created (or moved) buffer's row starts tinted with the accent and settles to its own fill
+    @keyframes buffer-arrived
+        from
+            background-color: color-mix(in srgb, var(--accent) 30%, transparent)
 </style>

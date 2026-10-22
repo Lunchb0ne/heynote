@@ -3,6 +3,7 @@
     import { mapState, mapActions } from 'pinia'
     import { useHeynoteStore } from "../stores/heynote-store"
     import { filenameSlug } from "@/src/common/sanitize-filename"
+    import { shake } from "@/src/util/motion"
 
     import FolderSelector from './folder-selector/FolderSelector.vue'
 
@@ -136,6 +137,7 @@
                 let slug = filenameSlug(this.name)
                 if (slug === "") {
                     this.errors.name = true
+                    shake(this.$refs.nameInput)
                     return
                 }
                 const parentPathPrefix = this.parentPath === "" ? "" : this.parentPath + pathSep
@@ -152,6 +154,7 @@
                 if (path !== this.currentBufferPath && this.buffers[path]) {
                     console.error("Failed to edit note, path already exists", path)
                     this.errors.name = true
+                    shake(this.$refs.nameInput)
                     return
                 }
                 console.log("Update note", path)

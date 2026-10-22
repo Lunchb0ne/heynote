@@ -2,6 +2,8 @@
     import { mapStores, mapState } from 'pinia'
 
     import { useHeynoteStore } from "@/src/stores/heynote-store"
+    import { SCRATCH_FILE_NAME } from "@/src/common/constants"
+    import { shake } from "@/src/util/motion"
 
     export default {
         name: 'TabItem',
@@ -23,6 +25,12 @@
                     }
                 },
                 immediate: true,
+            },
+            // the last tab (Scratch) can't be closed: shake it, so ⌘W or × doesn't silently do nothing
+            "heynoteStore.tabCloseRefusals"() {
+                if (this.path === SCRATCH_FILE_NAME) {
+                    shake(this.$el)
+                }
             },
         },
         computed: {

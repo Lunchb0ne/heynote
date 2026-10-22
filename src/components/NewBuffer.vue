@@ -3,6 +3,7 @@
     import { useHeynoteStore } from "../stores/heynote-store"
 
     import { filenameSlug } from "@/src/common/sanitize-filename"
+    import { shake } from "@/src/util/motion"
     import FolderSelector from './folder-selector/FolderSelector.vue'
 
     const pathSep = window.heynote.buffer.pathSeparator
@@ -224,6 +225,7 @@
             async submit() {
                 const path = this.findAvailableBufferPath()
                 if (!path) {
+                    shake(this.$refs.nameInput)
                     return
                 }
                 //console.log("Creating buffer", path, this.createBufferParams)

@@ -18,6 +18,8 @@ export const useHeynoteStore = defineStore("heynote", {
         recentBufferPaths: [SCRATCH_FILE_NAME],
         openTabs: [],
         closedTabs: [],
+        // bumped each time closing a tab is refused, so the tab can shake (TabItem.vue)
+        tabCloseRefusals: 0,
 
         currentEditor: null,
         currentBufferPath: null,
@@ -155,6 +157,7 @@ export const useHeynoteStore = defineStore("heynote", {
         closeTab(path) {
             if (path === SCRATCH_FILE_NAME && this.openTabs.length === 1) {
                 // don't close the scratch file if it's the only open tab
+                this.tabCloseRefusals++
                 return
             }
             const editorCacheStore = useEditorCacheStore()
