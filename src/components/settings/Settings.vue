@@ -64,6 +64,7 @@
                 bufferPath: this.initialSettings.bufferPath,
                 fontFamily: this.initialSettings.fontFamily || defaultFontFamily,
                 fontSize: this.initialSettings.fontSize || defaultFontSize,
+                uiFontFamily: this.initialSettings.uiFontFamily || "",
                 cursorBlinkRate: this.initialSettings.cursorBlinkRate ?? 1000,
                 languageOptions: LANGUAGES.map(l => {
                     return {
@@ -79,7 +80,12 @@
                 activeTab: "general",
                 isWebApp: window.heynote.platform.isWebApp,
                 customBufferLocation: !!this.initialSettings.bufferPath,
-                systemFonts: [[defaultFontFamily, defaultFontFamily + " (default)"]],
+                // the saved fonts are listed even before (or without) queryLocalFonts, so the selects show them
+                systemFonts: [
+                    [defaultFontFamily, defaultFontFamily + " (default)"],
+                    ...[...new Set([this.initialSettings.fontFamily, this.initialSettings.uiFontFamily])]
+                        .filter(f => f && f !== defaultFontFamily).map(f => [f, f]),
+                ],
                 defaultFontSize: defaultFontSize,
                 appVersion: "",
                 theme: this.themeSetting,
@@ -153,6 +159,7 @@
                     bufferPath: this.bufferPath,
                     fontFamily: this.fontFamily === defaultFontFamily ? undefined : this.fontFamily,
                     fontSize: this.fontSize === defaultFontSize ? undefined : this.fontSize,
+                    uiFontFamily: this.uiFontFamily || undefined,
                     cursorBlinkRate: this.cursorBlinkRate,
                     defaultBlockLanguage: this.defaultBlockLanguage === "text" ? undefined : this.defaultBlockLanguage,
                     defaultBlockLanguageAutoDetect: this.defaultBlockLanguageAutoDetect === true ? undefined : this.defaultBlockLanguageAutoDetect,
@@ -432,7 +439,19 @@
                         </div>
                         <div class="row font-settings">
                             <div class="entry">
-                                <h2>Font Family</h2>
+                                <h2>Interface Font</h2>
+                                <select v-model="uiFontFamily" @change="updateSettings" class="ui-font-family">
+                                    <option value="">System font (default)</option>
+                                    <option
+                                        v-for="[font, label] in systemFonts.slice(1)"
+                                        :value="font"
+                                    >{{ label }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row font-settings">
+                            <div class="entry">
+                                <h2>Editor Font</h2>
                                 <select v-model="fontFamily" @change="updateSettings" class="font-family">
                                     <option
                                         v-for="[font, label] in systemFonts"

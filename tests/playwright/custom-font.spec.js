@@ -65,6 +65,18 @@ test("test custom font", async ({ page }) => {
     })).toBeGreaterThan(20)
 })
 
+test("custom interface font applies to the UI, not the editor", async ({ page }) => {
+    await page.evaluate(() => {
+        window.queryLocalFonts = async () => [{ family: "Arial", style: "Regular" }]
+    })
+    await page.locator("css=.status-block.settings").click()
+    await page.locator("css=li.tab-appearance").click()
+    await page.locator("css=select.ui-font-family").selectOption("Arial")
+    await page.locator("body").press("Escape")
+    expect(await page.locator("body").evaluate((el) => getComputedStyle(el).fontFamily)).toMatch(/^"?Arial"?,/)
+    expect(await page.locator("css=.cm-content").evaluate((el) => getComputedStyle(el).fontFamily)).toContain("Hack")
+})
+
 test("markdown todo checkbox position with monospaced font", async ({ page }) => {
     await heynotePage.setContent(`
 ∞∞∞markdown

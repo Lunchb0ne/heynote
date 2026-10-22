@@ -68,6 +68,11 @@ export const useSettingsStore = defineStore("settings", {
             watch(() => this.settings.translucentWindow, (translucent) => {
                 document.documentElement.toggleAttribute("translucent", window.heynote.platform.isMac && translucent === true)
             }, {immediate: true})
+            // interface font, in front of the system font stack (--system-font in base.sass)
+            watch(() => this.settings.uiFontFamily, (font) => {
+                const style = document.documentElement.style
+                font ? style.setProperty("--ui-font", JSON.stringify(font)) : style.removeProperty("--ui-font")
+            }, {immediate: true})
             window.heynote.themeMode.onChange(onThemeChange)
         },
 

@@ -92,8 +92,10 @@ const schema = {
             // when default font settings are used, fontFamily and fontSize is not specified in the 
             // settings file, so that it's possible for us to change the default settings in the 
             // future and have it apply to existing users
-            "fontFamily": {type: "string"}, 
-            "fontSize": {type: "integer"}, 
+            "fontFamily": {type: "string"},
+            "fontSize": {type: "integer"},
+            // font of everything but the editor; unset means the system font
+            "uiFontFamily": {type: "string"},
 
             "searchSettings": {
                 type: "object",

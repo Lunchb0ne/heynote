@@ -3,7 +3,8 @@
 :root
     --tab-bar-height: 30px
     --status-bar-height: 28px
-    --system-font: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif
+    // --ui-font is the Interface Font setting (settings-store.js)
+    --system-font: var(--ui-font, -apple-system), system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif
     // Raycast-style palette: every tone is the text color at some alpha (see ray.so/themes)
     --window-bg-alpha: 1
     --text: rgb(var(--text-rgb) / 0.9)
