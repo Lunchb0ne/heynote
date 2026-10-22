@@ -22,42 +22,28 @@ class CheckboxWidget extends WidgetType {
         box.type = "checkbox"
         box.checked = this.checked
         box.tabIndex = -1
-        box.style.margin = "0"
-        box.style.padding = "0"
 
         if (this.monospace) {
-            // if the font is monospaced, we'll set the content of the wrapper to "   " and the 
-            // position of the checkbox to absolute, since three spaces will be the same width
-            // as "[ ]" and "[x]" so that characters on different lines will line up
+            // with a monospaced font the wrapper holds "    " (as wide as "[ ] ") and the checkbox is
+            // laid over it, so characters on different lines line up. Positioned in base.js
+            wrap.classList.add("monospace")
             wrap.appendChild(document.createTextNode("    "))
-            wrap.style.position = "relative"
-            box.style.position = "absolute"
-            // centered in the 1.4em line
-            box.style.top = "0.15em"
-            box.style.left = "0.25em"
-            box.style.width = "1.1em"
-            box.style.height = "1.1em"
-        } else {
-            // if the font isn't monospaced, we'll let the checkbox take up as much space as needed
-            box.style.position = "relative"
-            box.style.top = "0.1em"
-            box.style.marginRight = "0.5em"
         }
         wrap.appendChild(box)
         return wrap
     }
 
-    // keep the element when toggled, so the check draws in and the box pops (see base.js)
+    // keep the element when toggled, so the check draws in (base.js), and pop the box on checking
     updateDOM(dom: HTMLElement) {
         const box = dom.querySelector("input")
-        if (!box || this.monospace !== (dom.firstChild?.nodeType === Node.TEXT_NODE)) {
+        if (!box || this.monospace !== dom.classList.contains("monospace")) {
             return false
         }
-        if (this.checked && !box.checked) {
-            box.classList.remove("pop")
-            void box.offsetWidth // restart the animation if it's still running
-            box.classList.add("pop")
-            box.addEventListener("animationend", () => box.classList.remove("pop"), { once: true })
+        if (this.checked && !box.checked && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            box.animate(
+                [{ transform: "scale(0.88)" }, { transform: "scale(1.15)", offset: 0.45 }, { transform: "scale(1)" }],
+                { duration: 320, easing: "cubic-bezier(0.23, 1, 0.32, 1)" },
+            )
         }
         box.checked = this.checked
         return true
@@ -78,6 +64,8 @@ const justDoneTask = Decoration.mark({ class: "cm-task-done cm-task-just-done" }
 function checkboxes(view: EditorView, update?: ViewUpdate) {
     let widgets: any = []
     let done: any = []
+    // maps this update's positions back to before it
+    const inverted = update?.docChanged ? update.changes.invertedDesc : null
 
     for (let { from, to } of view.visibleRanges) {
         let range = view.state.sliceDoc(from, to)
@@ -95,9 +83,9 @@ function checkboxes(view: EditorView, update?: ViewUpdate) {
                 const lineEnd = view.state.doc.lineAt(end).to
                 if (checked && lineEnd > end) {
                     let justDone = false
-                    if (update?.docChanged) {
-                        const before = update.changes.invertedDesc.mapPos(boxFrom, 1)
-                        justDone = update.startState.sliceDoc(before, before + 3) === "[ ]"
+                    if (inverted) {
+                        const before = inverted.mapPos(boxFrom, 1)
+                        justDone = update!.startState.sliceDoc(before, before + 3) === "[ ]"
                     }
                     done.push((justDone ? justDoneTask : doneTask).range(end, lineEnd))
                 }
@@ -237,27 +225,24 @@ export const toggleCheckbox = (view: EditorView) => {
  */
 export const todoCheckboxPlugin = [
     ViewPlugin.fromClass(class {
-        decorations: DecorationSet
-        done: DecorationSet
+        sets: { widgets: DecorationSet, done: DecorationSet }
 
         constructor(view: EditorView) {
-            ({ widgets: this.decorations, done: this.done } = checkboxes(view))
+            this.sets = checkboxes(view)
         }
 
         update(update: ViewUpdate) {
             if (update.docChanged || update.viewportChanged || transactionsHasAnnotation(update.transactions, SET_FONT)) {
-                ({ widgets: this.decorations, done: this.done } = checkboxes(update.view, update))
+                this.sets = checkboxes(update.view, update)
             }
         }
     }, {
-        decorations: v => v.decorations,
+        decorations: v => v.sets.widgets,
 
         // only the widgets are atomic, not the done tasks' text
         provide: plugin => [
-            EditorView.atomicRanges.of(view => {
-                return view.plugin(plugin)?.decorations || Decoration.none
-            }),
-            EditorView.decorations.of(view => view.plugin(plugin)?.done || Decoration.none),
+            EditorView.atomicRanges.of(view => view.plugin(plugin)?.sets.widgets || Decoration.none),
+            EditorView.decorations.of(view => view.plugin(plugin)?.sets.done || Decoration.none),
         ],
 
         eventHandlers: {

@@ -89,6 +89,10 @@ input, button
         &.resizing-image
             cursor: nwse-resize
 
+// the editor's task checkboxes (todo-checkbox.ts); base.js sizes and places them
+.cm-taskmarker-toggle input[type=checkbox]
+    +rc-checkbox
+
 #syntaxTree
     height: 20%
     overflow-y: auto
