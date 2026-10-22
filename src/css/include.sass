@@ -71,19 +71,189 @@
     &:focus
         outline: none
 
+// press feedback for anything clicked with the mouse. Pass the element's other transitions so they
+// aren't overwritten. Keyboard-opened UI (palettes) deliberately has no motion.
+=press($also: null)
+    transition: transform 120ms var(--ease-out), $also
+    &:active
+        transform: scale(0.96)
+    @media (prefers-reduced-motion: reduce)
+        &:active
+            transform: none
+
+// disclosure chevron for folder/result rows, the same one the editor's fold gutter draws. It turns
+// down when the row gets .open instead of swapping images. Pass where it sits in the row.
+=disclosure-caret($left, $top: 50%)
+    position: relative
+    &::before
+        content: ""
+        position: absolute
+        left: $left
+        top: $top
+        width: 12px
+        height: 12px
+        margin-top: -6px
+        background-color: var(--text-600)
+        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M4.75 3.25L7.5 6l-2.75 2.75' fill='none' stroke='black' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 12px no-repeat
+        transition: rotate 200ms var(--ease-out)
+        pointer-events: none
+    &.open::before
+        rotate: 90deg
+    @media (prefers-reduced-motion: reduce)
+        &::before
+            transition: none
+
+// entrance for occasional modal dialogs (settings, errors): fade + settle from 97%. No exit
+// animation: v-if removes them at once, which keeps closing instant.
+=dialog-enter($base-transform: none)
+    transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out)
+    @starting-style
+        opacity: 0
+        transform: $base-transform scale(0.97)
+    @media (prefers-reduced-motion: reduce)
+        @starting-style
+            transform: $base-transform
+
+=shader-enter
+    transition: opacity 200ms ease
+    @starting-style
+        opacity: 0
+
 =rc-button
-    height: 26px
-    padding: 0 10px
+    height: 28px
+    padding: 0 12px
     border: none
     border-radius: 6px
     background: var(--fill-100)
     color: var(--text)
     font-size: 12px
     cursor: pointer
+    +press(background-color 150ms ease)
     &:hover
         background: var(--border-200)
+        transition-duration: 120ms, 0ms
     &:focus-visible
         outline: 2px solid var(--text-400)
+
+// the dialog's default action: inverted (text-coloured fill), like Raycast's primary buttons
+=rc-button-primary
+    background: var(--text)
+    color: rgb(var(--bg-rgb))
+    font-weight: 600
+    &:hover
+        background: rgb(var(--text-rgb))
+
+// round checkbox for picking several of a set (e.g. hotkey modifiers), the same as the editor's task
+// checkboxes (base.js): a hairline ring that fills with the text color as the check draws in
+=rc-checkbox
+    appearance: none
+    position: relative
+    flex-shrink: 0
+    width: 15px
+    height: 15px
+    margin: 0
+    border-radius: 50%
+    background: transparent
+    box-shadow: inset 0 0 0 1.5px rgb(var(--text-rgb) / 0.3)
+    cursor: pointer
+    transition: transform 120ms var(--ease-out), background-color 150ms ease, box-shadow 150ms ease
+    &::after
+        content: ""
+        position: absolute
+        inset: 0
+        background: rgb(var(--bg-rgb))
+        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M3.9 7.2l2.1 2.1 4.1-4.4' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 100% no-repeat
+        clip-path: inset(0 100% 0 0)
+        transition: clip-path 220ms var(--ease-out)
+    &:hover
+        box-shadow: inset 0 0 0 1.5px rgb(var(--text-rgb) / 0.5)
+        background-color: var(--fill-50)
+    &:active
+        transform: scale(0.88)
+    &:checked
+        background-color: var(--text)
+        box-shadow: none
+        &::after
+            clip-path: inset(0)
+    &:focus-visible
+        outline: 2px solid var(--text-400)
+        outline-offset: 2px
+    &:disabled
+        cursor: default
+        opacity: 0.4
+        transform: none
+
+// macOS switch for on/off settings. The knob widens while pressed (anchored to the side it rests
+// on) and slides across on release
+=rc-switch
+    appearance: none
+    position: relative
+    flex-shrink: 0
+    width: 26px
+    height: 15px
+    margin: 0
+    border-radius: 8px
+    background: var(--border-200)
+    cursor: pointer
+    transition: background-color 200ms ease
+    &::after
+        content: ""
+        position: absolute
+        top: 1.5px
+        left: 1.5px
+        width: 12px
+        height: 12px
+        border-radius: 6px
+        background: #fff
+        box-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 0 0 0.5px rgb(0 0 0 / 0.06)
+        transition: translate 220ms var(--ease-out), width 150ms var(--ease-out)
+    &:active::after
+        width: 15px
+    &:checked
+        background: var(--accent)
+        &::after
+            translate: 11px 0
+    &:checked:active::after
+        translate: 8px 0
+    &:focus-visible
+        outline: 2px solid var(--text-400)
+        outline-offset: 2px
+    &:disabled
+        cursor: default
+        opacity: 0.4
+        &::after
+            width: 12px
+    @media (prefers-reduced-motion: reduce)
+        &::after
+            transition: none
+
+// select with a macOS-style up/down chevron; the open menu stays native
+=rc-select
+    appearance: none
+    height: 26px
+    padding: 0 26px 0 9px
+    border: 1px solid var(--border)
+    border-radius: 6px
+    background: var(--fill-50) right 8px center / 8px 12px no-repeat
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 12'%3E%3Cpath d='M1.5 4.5L4 2l2.5 2.5M1.5 7.5L4 10l2.5-2.5' fill='none' stroke='black' stroke-opacity='.55' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    color: var(--text)
+    font-family: var(--system-font)
+    font-size: 12px
+    cursor: pointer
+    transition: background-color 120ms ease
+    +dark-mode
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 12'%3E%3Cpath d='M1.5 4.5L4 2l2.5 2.5M1.5 7.5L4 10l2.5-2.5' fill='none' stroke='white' stroke-opacity='.6' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    &:hover
+        background-color: var(--fill-100)
+    &:focus
+        outline: none
+    &:focus-visible
+        border-color: var(--border-200)
+        outline: 2px solid var(--text-400)
+        outline-offset: 1px
+    &:disabled
+        cursor: default
+        opacity: 0.4
 
 // Raycast-style floating panel. No backdrop-filter: over a transparent (vibrancy) window
 // Chromium renders it as a hard-edged dark rectangle.
@@ -91,6 +261,10 @@
     background: var(--popover-bg)
     border: 1px solid var(--border-200)
     border-radius: 12px
-    box-shadow: 0 16px 48px rgb(0 0 0 / 0.3)
+    // layered: a tight contact shadow for the edge plus a soft ambient one for lift
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.08), 0 8px 20px rgb(0 0 0 / 0.14), 0 24px 64px rgb(0 0 0 / 0.22)
     color: var(--text)
     overflow: hidden
+    +dark-mode
+        // lit top edge, the way Raycast's panels catch light
+        box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 20px rgb(0 0 0 / 0.3), 0 24px 64px rgb(0 0 0 / 0.45)
