@@ -75,6 +75,7 @@
         background-repeat: no-repeat
         background-position: center center
 
+        +press(background-color 120ms ease)
         &:hover
             background-color: var(--fill-100)
         &.disabled

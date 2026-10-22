@@ -84,15 +84,7 @@
                 &:hover
                     background-color: var(--fill-50)
     button.delete
+        +rc-button
         padding: 0 10px
         height: 22px
-        font-size: 12px
-        background: none
-        border: none
-        border-radius: 5px
-        cursor: pointer
-        background: var(--fill-100)
-        color: var(--text)
-        &:hover
-            background: var(--border-200)
 </style>

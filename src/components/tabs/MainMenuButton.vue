@@ -45,6 +45,7 @@
             background-position: center
             background-size: 14px
             border-radius: 6px
+            +press(background-color 120ms ease)
             +dark-mode
                 background-image: url("@/assets/icons/vertical-dots-dark.svg")
             &:hover

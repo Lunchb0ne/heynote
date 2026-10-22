@@ -24,6 +24,7 @@
         user-select: none
         cursor: pointer
         color: var(--text-600)
+        transition: background-color 120ms ease, color 120ms ease
         &:hover
             background: var(--fill-50)
             color: var(--text)

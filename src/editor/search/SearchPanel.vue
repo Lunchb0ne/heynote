@@ -344,6 +344,7 @@
             width: 24px
             border-radius: 6px
             cursor: pointer
+            +press(background-color 120ms ease)
             &:focus-visible
                 outline: none
                 border: 2px solid var(--text-400)
