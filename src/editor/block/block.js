@@ -1,4 +1,4 @@
-import { ViewPlugin, EditorView, Decoration, WidgetType, lineNumbers, GutterMarker, gutterLineClass } from "@codemirror/view"
+import { ViewPlugin, EditorView, Decoration, WidgetType, lineNumbers, GutterMarker, lineNumberMarkers } from "@codemirror/view"
 import { layer, RectangleMarker } from "@codemirror/view"
 import { EditorState, RangeSetBuilder, StateField, RangeSet, Transaction} from "@codemirror/state";
 import { syntaxTreeAvailable } from "@codemirror/language"
@@ -172,6 +172,10 @@ const atomicNoteBlock = ViewPlugin.fromClass(
 )
 
 
+// px from a block's text out to the divider between blocks: .heynote-block-start (base.js) is 25px
+// tall with the 1px rule at 12px
+const DIVIDER_OFFSET = 13
+
 const blockLayer = layer({
     above: false,
 
@@ -196,14 +200,13 @@ const blockLayer = layer({
             const toLine = view.state.doc.lineAt(toPos)
             const toLinePos = toLine.length === 0 ? toLine.from : Math.max(fromPos, Math.min(toPos, block.content.to))
             const toCoordsBottom = view.lineBlockAt(toLinePos)?.bottom
-            // same geometry as the focus band: 12px past the text on both sides, so the edges meet
-            // the divider in .heynote-block-start. Line block coordinates exclude the top padding.
+            // up to (not over) the dividers. Line block coordinates exclude the top padding.
             markers.push(new RectangleMarker(
                 idx++ % 2 == 0 ? "block-even" : "block-odd",
                 0,
-                fromCoordsTop + view.documentPadding.top - 12,
+                fromCoordsTop + view.documentPadding.top - (DIVIDER_OFFSET - 1),
                 null, // width is set to 100% in CSS
-                (toCoordsBottom - fromCoordsTop) + 24,
+                (toCoordsBottom - fromCoordsTop) + 2 * (DIVIDER_OFFSET - 1),
             ))
         })
         return markers
@@ -253,14 +256,15 @@ const focusBand = layer({
         const blockIndex = blocks.indexOf(block)
         const slide = focusBandBlock.has(view) && focusBandBlock.get(view) !== blockIndex
         focusBandBlock.set(view, blockIndex)
-        // 13px past the text on both sides puts the band's edge rows on the dividers in
-        // .heynote-block-start. Line block coordinates don't include the content's top padding.
-        const top = view.lineBlockAt(block.content.from).top + view.documentPadding.top - 13
-        const bottom = view.lineBlockAt(block.content.to).bottom + view.documentPadding.top + 13
+        // the band's edge rows lie on the dividers
+        const top = view.lineBlockAt(block.content.from).top + view.documentPadding.top - DIVIDER_OFFSET
+        const bottom = view.lineBlockAt(block.content.to).bottom + view.documentPadding.top + DIVIDER_OFFSET
         return [new FocusBandMarker(top, bottom - top, slide, blockIndex == blocks.length - 1)]
     },
+    // doc and geometry changes redraw the layer anyway; a cursor move only matters across blocks
     update(update) {
-        return update.docChanged || update.selectionSet || update.viewportChanged || update.geometryChanged
+        return update.viewportChanged ||
+            (update.selectionSet && getActiveNoteBlock(update.startState) !== getActiveNoteBlock(update.state))
     },
     class: "heynote-focus-band-layer",
 })
@@ -270,20 +274,25 @@ class ActiveBlockGutterMarker extends GutterMarker {
 }
 const activeBlockGutterMarker = new ActiveBlockGutterMarker()
 
-// marks the gutter lines of the block holding the cursor, so its line numbers can be brighter
-// ponytail: walks every line of the active block on each selection change, viewport-limit it if huge blocks lag
-const activeBlockGutter = gutterLineClass.compute(["selection", blockState], state => {
+// marks the line numbers of the block holding the cursor, so they can be brighter. Rebuilt only when
+// the cursor enters another block (unchanged blocks keep their identity in blockState)
+// ponytail: walks every line of the block, viewport-limit it if huge blocks lag
+let lastActiveBlock, lastActiveBlockMarkers = RangeSet.empty
+const activeBlockGutter = lineNumberMarkers.compute(["selection", blockState], state => {
     const block = getActiveNoteBlock(state)
-    if (!block) {
-        return RangeSet.empty
+    if (block === lastActiveBlock) {
+        return lastActiveBlockMarkers
     }
     const builder = new RangeSetBuilder()
-    const lastLine = state.doc.lineAt(block.content.to).number
-    for (let n = state.doc.lineAt(block.content.from).number; n <= lastLine; n++) {
-        const pos = state.doc.line(n).from
-        builder.add(pos, pos, activeBlockGutterMarker)
+    if (block) {
+        const lastLine = state.doc.lineAt(block.content.to).number
+        for (let n = state.doc.lineAt(block.content.from).number; n <= lastLine; n++) {
+            const pos = state.doc.line(n).from
+            builder.add(pos, pos, activeBlockGutterMarker)
+        }
     }
-    return builder.finish()
+    lastActiveBlock = block
+    return lastActiveBlockMarkers = builder.finish()
 })
 
 

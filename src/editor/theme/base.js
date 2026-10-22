@@ -64,9 +64,6 @@ export const heynoteBase = EditorView.theme({
         padding: '0 0 0 12px',
         userSelect: 'none',
     },
-    ".cm-gutterElement": {
-        transition: "color 150ms ease",
-    },
     // the smaller numbers keep the code's line height (1.4 of the editor font) so they don't ride
     // high, and drop to share the code's baseline
     ".cm-lineNumbers .cm-gutterElement": {
@@ -157,7 +154,8 @@ export const heynoteBase = EditorView.theme({
         display: 'flex',
         alignItems: 'center',
     },
-    // square, so turning it stays inside the column (a taller box overflows and scrolls the column)
+    // square, so turning it stays inside the column (a taller box overflows and scrolls the column).
+    // Not animated: the gutter swaps in a new element when the fold state changes
     '.cm-gutters .cm-gutterElement .heynote-fold-marker': {
         display: 'block',
         width: '9px',
@@ -166,7 +164,7 @@ export const heynoteBase = EditorView.theme({
         backgroundColor: 'currentColor',
         // path centered in its box, so turning it for the folded state doesn't shift it
         mask: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 9'%3E%3Cpath d='M2 3.25l2.5 2.5 2.5-2.5' fill='none' stroke='black' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 9px 9px no-repeat`,
-        transition: 'transform 200ms var(--ease-out), opacity 150ms ease, background-color 150ms ease',
+        transition: 'opacity 150ms ease, background-color 150ms ease',
     },
     '.cm-gutters .cm-gutterElement .heynote-fold-marker:hover': {
         backgroundColor: 'var(--text)',
