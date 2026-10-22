@@ -148,29 +148,19 @@
                 width: 1px
                 opacity: 0
                 pointer-events: none
-                background: rgba(0,0,0, 0.14)
+                background: var(--border-200)
                 transition: opacity 80ms ease
-                +dark-mode
-                    background: rgba(255,255,255, 0.18)
 
         input
             width: 100%
-            background: #fff
-            border: none
-            border-radius: 2px
+            +rc-input
             font-size: 13px
             height: 22px
             padding: 2px 4px
             font-style: italic
-            border: 2px solid #48b57e
-            &.error
-                border-color: #b64b4b
-            &:focus
-                outline: none
+            border-color: var(--border-200)
             &::placeholder
                 font-size: 12px
-            +dark-mode
-                background: #3b3b3b
 
     :global(.left-panel:hover) .folder.show-indent-guides .indent-guide,
     :global(.buffer-tree:hover) .folder.show-indent-guides .indent-guide

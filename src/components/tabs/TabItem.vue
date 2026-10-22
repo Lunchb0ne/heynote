@@ -90,99 +90,65 @@
 
 <style lang="sass" scoped>
     li
-        //app-region: none
         position: relative
-        height: 24px
-        margin-top: 0px
-        margin-right: 3px
-        padding: 6px 20px 0px 20px
+        height: 22px
+        line-height: 22px
+        margin-right: 2px
+        padding: 0 20px
         cursor: pointer
-        border-radius: 5px 5px 0 0
+        border-radius: 6px
         user-select: none
-        color: rgba(0,0,0, 0.5)
+        color: var(--text-600)
         overflow: hidden
         flex-grow: 0
         flex-shrink: 1
         flex-basis: auto
         min-width: 84px
         text-align: center
-        transition: background-color 250ms
-        //font-weight: 600
-        +dark-mode
-            color: rgba(255, 255, 255, 0.3)
-            height: 23px
-            margin-top: 1px
-            padding-top: 5px
+        transition: background-color 150ms
         &.short
             width: 120px
         &.long
             width: max-content
             max-width: 300px
-        &.active
-            background: var(--tab-active-bg)
-            color: rgba(0,0,0, 0.9)
-            border: 1px solid #dbdbdb
-            border-bottom: none
-            padding: 5px 19px 0px 19px
-            box-shadow: var(--tab-bar-inset-shadow)
-            transition: none
-            .blurred &
-                background: var(--tab-active-bg-blurred)
-            +dark-mode
-                color: rgba(255, 255, 255, 0.8)
-                border: none
-                padding: 5px 20px 0px 20px
-                //border-bottom: 1px solid #191d25
-                //border-color: transparent
-            .close
-                right: 1px
-                top: 3px
         &:hover
-            background: #c5c5c5
-            color: rgba(0,0,0, 0.9)
+            background: var(--fill-50)
+            color: var(--text)
             transition: none
-            //padding: 5px 16px 0px 16px
-            //border-color: var(--tab-bar-border-bottom-color)
-            box-shadow: var(--tab-bar-inset-shadow)
-            +dark-mode
-                background-color: #3a3a3a
-                //border-bottom: 1px solid #191d25
-                color: rgba(255, 255, 255, 0.9)
-            &.active
-                background: var(--tab-active-bg)
-                +dark-mode
-                    background: var(--tab-active-bg)
             .close
                 display: block
+        &.active
+            background: var(--fill-100)
+            color: var(--text)
+            transition: none
+            .blurred &
+                color: var(--text-600)
         
         .title
             display: inline-block
+            vertical-align: top
             white-space: nowrap
             max-width: 100%
-            height: 16px
             text-overflow: ellipsis
             overflow: hidden
         .close
             display: none
             position: absolute
-            right: 2px
-            top: 4px
-            width: 17px
-            height: 17px
+            right: 3px
+            top: 3px
+            width: 16px
+            height: 16px
             background: none
             border: none
             padding: 0
             background-image: url(@/assets/icons/close.svg)
             background-repeat: no-repeat
-            background-size: 14px
+            background-size: 12px
             background-position: center center
-            border-radius: 3px
+            border-radius: 4px
             cursor: pointer
-            &:hover
-                background-color: rgba(0, 0, 0, 0.2)
-                +dark-mode
-                    background-color: rgba(0, 0, 0, 0.3)
             +dark-mode
-                top: 3px
-                right: 1px
+                background-image: url(@/assets/icons/close-dark.svg)
+            &:hover
+                background-color: var(--fill-100)
 </style>

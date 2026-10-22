@@ -16,21 +16,19 @@
 
 <style scoped lang="sass">
     li
-        padding: 9px 20px
+        padding: 7px 12px
+        margin: 0 8px 2px 8px
+        border-radius: 6px
         font-size: 13px
         line-height: 1.3
         user-select: none
         cursor: pointer
+        color: var(--text-600)
         &:hover
-            background: #f1f1f1
-            +dark-mode
-                background: #292929
+            background: var(--fill-50)
+            color: var(--text)
         &.active
-            background: var(--highlight-color)
-            color: #fff
+            background: var(--fill-100)
+            color: var(--text)
             cursor: default
-            +dark-mode
-                // needed for specificity (to not be overridden by :hover in dark mode)
-                background: var(--highlight-color)
-                
 </style>

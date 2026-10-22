@@ -71,42 +71,23 @@
         background-position-y: 5px
         background-position-x: calc(2px + var(--indent-level) * 16px)
         user-select: none
+        border-radius: 6px
+        color: var(--text)
         +dark-mode
             background-image: url('@/assets/icons/caret-right-white.svg')
-            color: rgba(255,255,255, 0.87)
         &:hover
-            background-color: #f1f1f1
-            +dark-mode
-                background-color: #39393a
+            background-color: var(--fill-50)
         &.open
             background-image: url('@/assets/icons/caret-down.svg')
             +dark-mode
                 background-image: url('@/assets/icons/caret-down-white.svg')
         &.selected
-            background-color: #48b57e
-            color: #fff
-            background-image: url('@/assets/icons/caret-right-white.svg')
-            &.open
-                background-image: url('@/assets/icons/caret-down-white.svg')
-            &:hover
-                background-color: #40a773
-            +dark-mode
-                background-color: #1b6540
-                color: rgba(255,255,255, 0.87)
-                &:hover
-                    background-color: #1f6f47
+            background-color: var(--fill-100)
             .new-folder
                 display: block
-                color: rgba(255,255,255, 0.9)
         &.new
             font-style: italic
-            color: rgba(0,0,0, 0.5)
-            &.selected
-                color: rgba(255,255,255, 0.8)
-            +dark-mode
-                color: rgba(255,255,255, 0.5)
-                &.selected
-                    color: rgba(255,255,255, 0.8)
+            color: var(--text-600)
 
 
         .name
@@ -115,9 +96,10 @@
             text-overflow: ellipsis
             white-space: nowrap
         .new-folder
-            background: rgba(0,0,0, 0.15)
+            background: var(--fill-100)
+            color: var(--text)
             border: none
-            border-radius: 2px
+            border-radius: 4px
             font-size: 10px
             display: none
             flex-shrink: 0

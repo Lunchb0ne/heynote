@@ -68,7 +68,7 @@
         height: 22px
         margin-right: 2px
         border: none
-        border-radius: 2px
+        border-radius: 5px
         cursor: pointer
         background-color: transparent
         background-size: 14px
@@ -76,9 +76,7 @@
         background-position: center center
 
         &:hover
-            background-color: rgba(0,0,0, 0.1)
-            +dark-mode
-                background-color: rgba(255,255,255, 0.15)
+            background-color: var(--fill-100)
         &.disabled
             cursor: default
             opacity: 0.45
@@ -86,13 +84,11 @@
                 background-color: transparent
         
         &.active
-            background-color: #DFF1E9
-            border: 1px solid #48b57e
-            +dark-mode
-                background-color: #395f4f
+            background-color: var(--fill-100)
+            box-shadow: inset 0 0 0 1px var(--border-200)
         
         &:focus-visible
-            border: 2px solid #48b57e
+            border: 2px solid var(--text-400)
             outline: none
         
         &.block

@@ -239,9 +239,7 @@
 
 <style lang="sass" scoped>
     .result-container
-        color: rgba(0,0,0, 0.7)
-        +dark-mode
-            color: rgba(255,255,255, 0.7)
+        color: var(--text-600)
         .buffer
             cursor: pointer
             line-height: 20px
@@ -261,13 +259,11 @@
                 +dark-mode
                     background-image: url('@/assets/icons/caret-down-white.svg')
             &:hover
-                background-color: rgba(0,0,0, 0.06)
-                +dark-mode
-                    background-color: rgba(255,255,255, 0.08)
+                background-color: var(--fill-50)
             &:focus
                 outline: none
             &:focus-visible
-                outline: 1px solid #48b57e
+                outline: 1px solid var(--border-200)
                 outline-offset: -1px
                 z-index: 1
             .name
@@ -288,13 +284,11 @@
                 overflow: hidden
                 position: relative
                 &:hover
-                    background-color: rgba(0,0,0, 0.06)
-                    +dark-mode
-                        background-color: rgba(255,255,255, 0.08)
+                    background-color: var(--fill-50)
                 &:focus
                     outline: none
                 &:focus-visible
-                    outline: 1px solid #48b57e
+                    outline: 1px solid var(--border-200)
                     outline-offset: -1px
                     z-index: 1
                 .indent-guide
@@ -305,10 +299,8 @@
                     width: 1px
                     opacity: var(--search-indent-guide-opacity, 0)
                     pointer-events: none
-                    background: rgba(0,0,0, 0.14)
+                    background: var(--border-200)
                     transition: opacity 80ms ease
-                    +dark-mode
-                        background: rgba(255,255,255, 0.18)
                 .line-number
                     flex: 0 0 32px
                     text-align: right
@@ -320,7 +312,5 @@
                     text-overflow: ellipsis
                     strong
                         font-weight: 700
-                        color: rgba(0,0,0, 0.88)
-                        +dark-mode
-                            color: rgba(255,255,255, 0.95)
+                        color: var(--text)
 </style>

@@ -42,3 +42,55 @@
 =fullscreen()
     html[fullscreen=true] &
         @content
+
+// Raycast-style text field
+=rc-input
+    background: var(--fill-50)
+    color: var(--text)
+    border: 1px solid var(--border)
+    border-radius: 6px
+    &::placeholder
+        color: var(--text-400)
+    &:focus
+        outline: none
+        border-color: var(--border-200)
+        background: var(--fill-100)
+    &.error
+        border-color: var(--accent)
+        background: color-mix(in srgb, var(--accent) 10%, transparent)
+
+// borderless search field at the top of a palette
+=rc-palette-input
+    background: transparent
+    color: var(--text)
+    font-size: 15px
+    border: none
+    box-sizing: border-box
+    &::placeholder
+        color: var(--text-400)
+    &:focus
+        outline: none
+
+=rc-button
+    height: 26px
+    padding: 0 10px
+    border: none
+    border-radius: 6px
+    background: var(--fill-100)
+    color: var(--text)
+    font-size: 12px
+    cursor: pointer
+    &:hover
+        background: var(--border-200)
+    &:focus-visible
+        outline: 2px solid var(--text-400)
+
+// Raycast-style floating panel. No backdrop-filter: over a transparent (vibrancy) window
+// Chromium renders it as a hard-edged dark rectangle.
+=rc-popover
+    background: var(--popover-bg)
+    border: 1px solid var(--border-200)
+    border-radius: 12px
+    box-shadow: 0 16px 48px rgb(0 0 0 / 0.3)
+    color: var(--text)
+    overflow: hidden

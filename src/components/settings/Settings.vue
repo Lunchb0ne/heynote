@@ -611,18 +611,10 @@
             max-height: 100%
             display: flex
             flex-direction: column
-            border-radius: 5px
-            background: #fff
-            color: #333
-            box-shadow: 0 0 25px rgba(0, 0, 0, 0.2)
+            +rc-popover
             overflow-y: auto
             &:active, &:selected, &:focus, &:focus-visible
-                border: none
                 outline: none
-            +dark-mode
-                background: #333
-                color: #eee
-                box-shadow: 0 0 25px rgba(0, 0, 0, 0.3)
             .dialog-content
                 flex-grow: 1
                 display: flex
@@ -630,10 +622,8 @@
                 .sidebar
                     box-sizing: border-box
                     width: 140px
-                    border-right: 1px solid #eee
+                    border-right: 1px solid var(--border)
                     padding-top: 20px
-                    +dark-mode
-                        border-right: 1px solid #222
                     h1
                         font-size: 16px
                         font-weight: 700
@@ -692,24 +682,21 @@
                                     font-size: 12px
                                     font-family: "Hack"
                                     padding: 5px 8px
-                                    border-radius: 3px
-                                    background: #f1f1f1
-                                    color: #555
+                                    border-radius: 6px
+                                    background: var(--fill-50)
+                                    color: var(--text-600)
                                     white-space: nowrap
                                     overflow-x: auto
-                                    +dark-mode
-                                        background: #222
-                                        color: #aaa
             .bottom-bar
                 box-sizing: border-box
                 height: var(--bottom-bar-height)
-                border-radius: 0 0 5px 5px
-                background: #eee
+                border-top: 1px solid var(--border)
+                background: var(--fill-25)
                 text-align: right
                 padding: 10px 20px
-                +dark-mode
-                    background: #222
                 .close
+                    +rc-button
                     height: 28px
-                    cursor: pointer
+                    padding: 0 14px
+                    font-weight: 600
 </style>

@@ -64,9 +64,7 @@
     tr
         &.overridden
             text-decoration: line-through
-            color: rgba(0,0,0, 0.4)
-            +dark-mode
-                color: rgba(255,255,255, 0.4)
+            color: var(--text-400)
         td
             &.key
                 //letter-spacing: 1px
@@ -76,32 +74,25 @@
                 width: 24px
                 padding: 0
                 cursor: ns-resize
-                background-color: rgba(0,0,0, 0.02)
+                background-color: var(--fill-25)
                 background-size: 20px
                 background-repeat: no-repeat
                 background-position: center center
                 background-image: url(@/assets/icons/drag-vertical-light.svg)
                 +dark-mode
-                    background-color: rgba(0,0,0, 0.08)
                     background-image: url(@/assets/icons/drag-vertical-dark.svg)
                 &:hover
-                    background-color: rgba(0,0,0, 0.05)
-                    +dark-mode
-                        background-color: rgba(0,0,0, 0.25)
+                    background-color: var(--fill-50)
     button.delete
         padding: 0 10px
         height: 22px
         font-size: 12px
         background: none
         border: none
-        border-radius: 2px
+        border-radius: 5px
         cursor: pointer
-        background: #ddd
+        background: var(--fill-100)
+        color: var(--text)
         &:hover
-            background: #ccc
-        +dark-mode
-            background: #555
-            color: #fff
-            &:hover
-                background: #666
+            background: var(--border-200)
 </style>

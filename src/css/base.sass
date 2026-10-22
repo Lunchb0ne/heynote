@@ -2,56 +2,56 @@
 
 :root
     --tab-bar-height: 30px
-    --status-bar-height: 21px
+    --status-bar-height: 28px
     --system-font: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif
+    // Raycast-style palette: every tone is the text color at some alpha (see ray.so/themes)
+    --window-bg-alpha: 1
+    --text: rgb(var(--text-rgb) / 0.9)
+    --text-600: rgb(var(--text-rgb) / 0.6)
+    --text-400: rgb(var(--text-rgb) / 0.4)
+    --text-250: rgb(var(--text-rgb) / 0.25)
+    --fill-100: rgb(var(--text-rgb) / 0.1)
+    --fill-50: rgb(var(--text-rgb) / 0.05)
+    --fill-25: rgb(var(--text-rgb) / 0.025)
+    --border: rgb(var(--text-rgb) / 0.08)
+    --border-200: rgb(var(--text-rgb) / 0.16)
+    --window-bg: rgb(var(--bg-rgb) / var(--window-bg-alpha))
+    // opaque: in a vibrancy window macOS lets the material bleed through any alpha < 1
+    --popover-bg: rgb(var(--bg-rgb))
+    --accent: #FF6363
+    --highlight-color: var(--fill-100)
+    --draw-element-handle-color: #007bff
 
 :root[theme='light']
-    --status-bar-background: #48b57e
-    --status-bar-color: #fff
-    --highlight-color: #48b57e
-    --panel-background: #efefef
-    //--tab-bar-inset-shadow: inset 0 -1px 2px rgba(0, 0, 0, 0.05)
-    --tab-bar-border-bottom-color: #d4d4d4
-    --tab-active-bg: #fff
-    --tab-active-bg-blurred: #f4f4f4
-    --window-border-color: #6b6b6b
-    --draw-element-handle-color: #007bff
+    --bg-rgb: 255 255 255
+    --text-rgb: 0 0 0
 
 :root[theme='dark']
-    --status-bar-background: #0e1217
-    --status-bar-color: rgba(255, 255, 255, 0.75)
-    --highlight-color: #1b6540
-    --panel-background: #151516
-    //--tab-bar-inset-shadow: inset 0 -1px 3px rgba(0,0,0,0.2)
-    --tab-bar-border-bottom-color: #161616
-    --tab-active-bg: #213644
-    --tab-active-bg-blurred: #1b2b36
-    --window-border-color: #000
-    --draw-element-handle-color: #007bff
-    
+    --bg-rgb: 28 28 30
+    --text-rgb: 255 255 255
+
+// native vibrancy (set by the main process on macOS) shows through a light tint of the window color
+html[translucent]
+    --window-bg-alpha: 0.4
+
 html
     margin: 0
     padding: 0
     height: 100%
     overscroll-behavior-y: none
-    //&[platform=windows], &[platform=linux]
-    //    border: 1px solid var(--window-border-color)
-    //&[fullscreen=true]
-    //    border: none
 body
     margin: 0
     padding: 0
-    background: #f4f8f4
-    color: #444
-    font-family: "Open Sans"
+    background: var(--window-bg)
+    color: var(--text)
+    font-family: var(--system-font)
     height: 100%
     font-size: 12px
     overscroll-behavior-y: none
-    +dark-mode
-        background: #252B37
+    -webkit-font-smoothing: antialiased
 
 input, button
-    font-family: "Open Sans"
+    font-family: var(--system-font)
 
 #app
     height: 100%

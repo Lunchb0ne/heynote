@@ -44,13 +44,11 @@
             background-repeat: no-repeat
             background-position: center
             background-size: 14px
-            border-radius: 3px
+            border-radius: 6px
             +dark-mode
                 background-image: url("@/assets/icons/vertical-dots-dark.svg")
             &:hover
-                background-color: #ccc
-                +dark-mode
-                    background-color: #3a3a3a
+                background-color: var(--fill-100)
         +platform-mac
             width: 80px
             button

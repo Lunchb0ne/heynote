@@ -746,19 +746,19 @@
         &:focus
             outline: none
             .item.selected
-                outline: 1px solid #48b57e
+                outline: 1px solid var(--border-200)
                 outline-offset: -1px
                 z-index: 1
         &.root-drop-target
-            background: rgba(0,0,0, 0.05)
-            +dark-mode
-                background: rgba(255,255,255, 0.08)
+            background: var(--fill-50)
 
     .item
         user-select: none
         font-size: 13px
         line-height: 20px
         padding: 2px 10px
+        margin: 0 6px
+        border-radius: 6px
         scroll-margin-top: 36px
         scroll-margin-bottom: 36px
         padding-left: calc(24px + var(--indent-level) * 20px)
@@ -768,19 +768,15 @@
         overflow: hidden
         text-overflow: ellipsis
         cursor: pointer
-        color: rgba(0,0,0, 0.6)
-        +dark-mode
-            color: rgba(255,255,255, 0.6)
+        color: var(--text-600)
         &.buffer
             padding-left: calc(13px + var(--indent-level) * 20px)
             &:hover
-                background-color: rgba(0,0,0, 0.06)
-                +dark-mode
-                    background-color: rgba(255,255,255, 0.08)
+                background-color: var(--fill-50)
+                color: var(--text)
             &.active
-                background-color: #d4ded9
-                +dark-mode
-                    background-color: #244233
+                background-color: var(--fill-100)
+                color: var(--text)
             &.scratch
                 font-style: italic
         &.folder
@@ -792,17 +788,13 @@
             +dark-mode
                 background-image: url('@/assets/icons/caret-right-white.svg')
             &:hover
-                background-color: rgba(0,0,0, 0.06)
-                +dark-mode
-                    background-color: rgba(255,255,255, 0.08)
+                background-color: var(--fill-50)
             &.open
                 background-image: url('@/assets/icons/caret-down.svg')
                 +dark-mode
                     background-image: url('@/assets/icons/caret-down-white.svg')
             &.drop-target
-                background-color: rgba(0,0,0, 0.10)
-                +dark-mode
-                    background-color: rgba(255,255,255, 0.16)
+                background-color: var(--fill-100)
 
     .indent-guide
         position: absolute
@@ -812,10 +804,8 @@
         width: 1px
         opacity: 0
         pointer-events: none
-        background: rgba(0,0,0, 0.14)
+        background: var(--border-200)
         transition: opacity 80ms ease
-        +dark-mode
-            background: rgba(255,255,255, 0.18)
 
     .buffer-tree:hover .indent-guide,
     :global(.left-panel:hover) .buffer-tree .indent-guide

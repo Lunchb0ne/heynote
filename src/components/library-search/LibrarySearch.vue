@@ -284,48 +284,25 @@
                 padding: 0 1px
                 font-size: 12px
                 line-height: 16px
-                color: rgba(0,0,0, 0.55)
-                +dark-mode
-                    color: rgba(255,255,255, 0.55)
+                color: var(--text-600)
                 b
-                    color: rgba(0,0,0, 0.8)
-                    +dark-mode
-                        color: rgba(255,255,255, 0.8)
+                    color: var(--text)
             .search-error
                 margin-top: 8px
                 padding: 0 1px
                 font-size: 12px
                 line-height: 16px
-                color: #b42318
-                +dark-mode
-                    color: #ffb4ab
+                color: var(--accent)
             .input-container
                 position: relative
                 flex-grow: 1
 
                 input[type="text"]
-                    background: #fff
-                    padding: 6px 5px
-                    border: 1px solid #ccc
+                    +rc-input
+                    padding: 6px 8px
                     box-sizing: border-box
-                    border-radius: 3px
                     width: 100%
                     padding-right: 74px
-                    &:focus
-                        outline: none
-                        border: 1px solid #fff
-                        outline: 2px solid #48b57e
-                        border-radius: 2px
-                    &::placeholder
-                        color: rgba(0,0,0, 0.6)
-                    +dark-mode
-                        background: #3b3b3b
-                        color: rgba(255,255,255, 0.9)
-                        border: 1px solid #4c4c4c
-                        &:focus
-                            border: 1px solid #3b3b3b
-                        &::placeholder
-                            color: rgba(255,255,255, 0.6)
                     +webapp-mobile
                         font-size: 16px
                         max-width: 100%
@@ -345,7 +322,7 @@
             &:focus
                 outline: none
                 :deep(.search-result-row.selected)
-                    outline: 1px solid #48b57e
+                    outline: 1px solid var(--border-200)
                     outline-offset: -1px
                     z-index: 1
 

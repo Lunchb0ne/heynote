@@ -298,93 +298,64 @@
         background: rgba(0,0,0, 0.2)
         z-index: 400 // above the search panel which have z-index 300
     .new-buffer
+        +rc-popover
         font-size: 13px
-        //background: #48b57e
-        background: #efefef
         width: 420px
         position: absolute
-        top: 0
+        top: calc(var(--tab-bar-height) + 8px)
         left: 50%
         transform: translateX(-50%)
-        border-radius: 0 0 5px 5px
-        box-shadow: 0 0 10px rgba(0,0,0,0.3)
         display: flex
         flex-direction: column
-        max-height: 100%
+        max-height: calc(100% - 16px)
         &:focus
             outline: none
-        +dark-mode
-            background: #151516
-            box-shadow: 0 0 10px rgba(0,0,0,0.5)
-            color: rgba(255,255,255, 0.7)
         +webapp-mobile
             max-width: calc(100% - 80px)
         
         .container
-            padding: 10px
+            padding: 12px
             min-height: 0
             display: flex
             flex-direction: column
 
             h1
-                font-weight: bold
+                font-weight: 600
                 margin-bottom: 14px
             
             label
                 display: block
                 margin-bottom: 6px
-                //padding-left: 2px
                 font-size: 12px
-                font-weight: 600
+                font-weight: 500
+                color: var(--text-600)
 
-            
             .name-input
+                +rc-input
                 width: 100%
-                background: #fff
-                padding: 4px 5px
-                border: 1px solid #ccc
+                padding: 6px 8px
                 box-sizing: border-box
-                border-radius: 2px
                 margin-bottom: 16px
-                &:focus
-                    outline: none
-                    border: 1px solid #fff
-                    outline: 2px solid #48b57e
-                &.error
-                    background: #ffe9e9
-                +dark-mode
-                    background: #3b3b3b
-                    color: rgba(255,255,255, 0.9)
-                    border: 1px solid #5a5a5a
-                    &:focus
-                        border: 1px solid #3b3b3b
                 +webapp-mobile
                     font-size: 16px
                     max-width: 100%
         
         .bottom-bar
-            border-radius: 0 0 5px 5px
-            //background: #e3e3e3
-            padding: 10px
-            padding-top: 0
+            border-top: 1px solid var(--border)
+            background: var(--fill-25)
+            padding: 8px 12px
             display: flex
             justify-content: space-between
             button
-                font-size: 12px
-                height: 28px
-                border: 1px solid #c5c5c5
-                border-radius: 3px
-                padding-left: 10px
-                padding-right: 10px
-                &:focus
-                    outline-color: #48b57e
-                +dark-mode
-                    background: #444
-                    border: none
-                    color: rgba(255,255,255, 0.75)
+                +rc-button
                 &[type="submit"]
                     order: 1
+                    font-weight: 600
                 &.cancel
                     order: 0
+                    background: transparent
+                    color: var(--text-600)
+                    &:hover
+                        background: var(--fill-100)
         
 </style>

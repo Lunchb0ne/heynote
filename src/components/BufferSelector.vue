@@ -306,6 +306,7 @@
                 @keydown="onKeydown"
                 @input="onInput"
                 v-model="filter"
+                :placeholder="commandsEnabled ? 'Search buffers, or > for commands…' : 'Search buffers…'"
                 autocomplete="off"
                 spellcheck="false"
             />
@@ -367,107 +368,69 @@
 
 <style scoped lang="sass">
     .note-selector
+        +rc-popover
         font-size: 13px
-        background: #efefef
         position: absolute
-        top: 0
+        top: 8px
         left: 50%
         width: 480px
         transform: translateX(-50%)
-        max-height: 100%
+        max-height: calc(100% - 16px)
         box-sizing: border-box
         display: flex
         flex-direction: column
-        border-radius: 0 0 5px 5px
-        box-shadow: 0 0 10px rgba(0,0,0,0.3)
         z-index: 400 // above the search panel which have z-index 300
-        +dark-mode
-            background: #151516
-            box-shadow: 0 0 10px rgba(0,0,0,0.5)
-            color: rgba(255,255,255, 0.7)
         +webapp-mobile
             max-width: calc(100% - 80px)
 
         .input-container
-            padding: 10px
+            padding: 6px 8px
+            border-bottom: 1px solid var(--border)
             h1
                 font-weight: bold
                 margin-bottom: 14px
             input
-                background: #fff
-                padding: 4px 5px
-                border: 1px solid #ccc
-                box-sizing: border-box
-                border-radius: 2px
+                +rc-palette-input
+                padding: 6px 4px
                 width: 100%
-                &:focus
-                    outline: none
-                    border: 1px solid #fff
-                    outline: 2px solid #48b57e
-                +dark-mode
-                    background: #3b3b3b
-                    color: rgba(255,255,255, 0.9)
-                    border: 1px solid #5a5a5a
-                    &:focus
-                        border: 1px solid #3b3b3b
                 +webapp-mobile
                     font-size: 16px
                     max-width: 100%
         
         .scroller
             overflow-y: auto
-            padding: 0 10px 5px 10px
+            padding: 6px
         
         .items
             > li.line-separator
                 height: 1px
-                background: rgba(0,0,0, 0.05)
-                margin-left: -10px
-                margin-right: -10px
-                margin-top: 3px
-                margin-bottom: 3px
-                +dark-mode
-                    background: rgba(255,255,255, 0.1)
+                background: var(--border)
+                margin: 4px -6px
             > li.item
                 position: relative
-                border-radius: 3px
-                padding: 3px 12px
+                border-radius: 8px
+                padding: 5px 10px
                 line-height: 18px
+                color: var(--text)
                 display: flex
                 align-items: center
                 scroll-margin-top: 6px
                 scroll-margin-bottom: 6px
                 cursor: pointer
                 &:hover
-                    background: #e2e2e2
+                    background: var(--fill-50)
                     .action-buttons .show-actions
                         display: inline-block
-                        background-image: url(@/assets/icons/arrow-right-black.svg)
-                    &.selected .action-buttons .show-actions
-                        background-image: url(@/assets/icons/arrow-right-white.svg)
-                +dark-mode
-                    color: rgba(255,255,255, 0.65)
-                    &:hover
-                        background: #29292a
-                    .action-buttons button
-                        color: #fff
+                .action-buttons button
+                    color: var(--text)
                 &.selected
-                    background: #48b57e
-                    color: #fff
+                    background: var(--fill-100)
                     &.action-buttons-visible
                         background: none
-                        border: 1px solid #48b57e
-                        padding: 2px 11px
-                        color: #444
+                        box-shadow: inset 0 0 0 1px var(--border-200)
+                        color: var(--text-600)
                     .action-buttons .show-actions
                         display: inline-block
-                    +dark-mode
-                        background: #1b6540
-                        color: rgba(255,255,255, 0.87)
-                        &.action-buttons-visible
-                            background: none
-                            border: 1px solid #1b6540
-                            color: rgba(255,255,255, 0.65)
                 &.scratch
                     font-weight: 600
                 &.new-note
@@ -510,46 +473,31 @@
                     
                 .action-buttons
                     position: absolute
-                    top: 1px
-                    right: 0px
+                    top: 4px
+                    right: 4px
                     padding: 0 1px
                     &.visible
-                        background: #efefef
-                        +dark-mode
-                            background: #151516
+                        background: var(--popover-bg)
                     button
                         padding: 0 10px
                         height: 20px
                         font-size: 12px
                         background: none
                         border: none
-                        border-radius: 2px
+                        border-radius: 5px
                         margin-right: 2px
                         cursor: pointer
                         &:last-child
                             margin-right: 0
                         &:hover
-                            background: rgba(0,0,0, 0.1)
-                        +dark-mode
-                            &:hover
-                                background-color: rgba(255,255,255, 0.1)
+                            background: var(--fill-100)
                         &.selected
-                            background: #48b57e
-                            color: #fff
-                            &:hover
-                                background: #3ea471
+                            background: var(--fill-100)
+                            box-shadow: inset 0 0 0 1px var(--border-200)
                             &.delete
-                                background: #e95050
-                                &:hover
-                                    background: #ce4848
-                            +dark-mode
-                                background: #1b6540
-                                &:hover
-                                    background: #1f7449
-                                &.delete
-                                    background: #ae1e1e
-                                    &:hover
-                                        background: #bf2222
+                                background: var(--accent)
+                                box-shadow: none
+                                color: #fff
                             &.confirm
                                 font-weight: 600
                         &.show-actions
@@ -558,7 +506,7 @@
                             top: 1px
                             padding: 1px 8px
                             //cursor: default
-                            background-image: url(@/assets/icons/arrow-right-white.svg)
+                            background-image: url(@/assets/icons/arrow-right-black.svg)
                             width: 22px
                             height: 19px
                             background-size: 19px

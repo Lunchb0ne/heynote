@@ -1,7 +1,6 @@
 <script>
     import { mapState, mapStores, mapWritableState } from "pinia"
 
-    import { TITLE_BAR_BG_LIGHT, TITLE_BAR_BG_DARK, TITLE_BAR_BG_LIGHT_BLURRED, TITLE_BAR_BG_DARK_BLURRED } from "@/src/common/constants"
     import { useHeynoteStore } from "@/src/stores/heynote-store"
     import { useSettingsStore } from "@/src/stores/settings-store"
 
@@ -46,20 +45,6 @@
                 "theme",
             ]),
             ...mapStores(useHeynoteStore, useSettingsStore),
-
-            backgroundColor() {
-                if (this.theme === "dark") {
-                    return this.isFocused ? TITLE_BAR_BG_DARK : TITLE_BAR_BG_DARK_BLURRED
-                } else {
-                    return this.isFocused ? TITLE_BAR_BG_LIGHT : TITLE_BAR_BG_LIGHT_BLURRED
-                }
-            },
-
-            style() {
-                return {
-                    backgroundColor: this.backgroundColor,
-                }
-            },
 
             resizerClass() {
                 return {
@@ -121,7 +106,7 @@
 </script>
 
 <template>
-    <aside class="left-panel" :style="style">
+    <aside class="left-panel">
         <div class="top-bar">
             <MainMenuButton />
         </div>
@@ -148,9 +133,7 @@
 
 <style scoped lang="sass">
     .left-panel
-        --resizer-color: #2482ce
-        +dark-mode
-            --resizer-color: #0060c7
+        --resizer-color: var(--text-250)
 
         width: var(--left-panel-width)
         flex-shrink: 0
@@ -169,50 +152,35 @@
         .left-panel-content
             flex-grow: 1
             min-height: 0
-            //border-right: 1px solid var(--tab-bar-border-bottom-color)
 
         .left-panel-tab-buttons
             app-region: none
-            padding: 0px
+            padding: 4px
+            gap: 4px
             display: flex
             align-items: center
-            //justify-content: center
             width: 100%
-            border-top: 1px solid var(--tab-bar-border-bottom-color)
-            +dark-mode
-                background: #282828
+            box-sizing: border-box
+            border-top: 1px solid var(--border)
             button
-                width: 50%
+                flex: 1
                 background: none
                 border: none
-                //border-radius: 3px 3px 0 0
-                padding: 5px 8px 6px 8px
-                margin-right: 0px
-                color: rgba(0,0,0, 0.6)
+                border-radius: 6px
+                padding: 4px 8px
+                color: var(--text-600)
                 cursor: pointer
                 font-size: 12px
-                position: relative
-                top: -1px
-                border-top: 1px solid transparent
-                +dark-mode
-                    color: rgba(255,255,255, 0.6)
                 &:focus
                     outline: none
                 &:focus-visible
-                    box-shadow: inset 0 0 0 2px #388c62
-                    z-index: 1
-                    +dark-mode
-                        box-shadow: inset 0 0 0 2px #48b57e
-                &:last-child  
-                    margin-right: 0
+                    box-shadow: inset 0 0 0 2px var(--text-400)
                 &:hover
-                    background-color: rgba(0,0,0, 0.08)
-                    +dark-mode
-                        background-color: rgba(255,255,255, 0.08)
+                    background-color: var(--fill-50)
+                    color: var(--text)
                 &.selected
-                    border-top: 1px solid rgba(0,0,0, 0.7)
-                    +dark-mode
-                        border-top: 1px solid rgba(255,255,255, 0.8)
+                    background-color: var(--fill-100)
+                    color: var(--text)
                 .icon
                     display: inline-block
                     width: 12px

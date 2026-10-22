@@ -179,22 +179,21 @@
             top: 4px
             width: 14px
             height: 14px
-            +dark-mode
-                opacity: 0.9
-            background-size: 14px
-            background-repeat: no-repeat
-            background-position: center center
-            background-image: url("@/assets/icons/update.svg")
+            background-color: currentColor
+            mask-size: 14px
+            mask-repeat: no-repeat
+            mask-position: center center
+            mask-image: url("@/assets/icons/update.svg")
             animation-name: spin
             animation-duration: 2000ms
             animation-iteration-count: infinite
             animation-timing-function: linear
             animation-play-state: paused
             &.icon-download
-                background-image: url("@/assets/icons/download.svg")
+                mask-image: url("@/assets/icons/download.svg")
                 width: 16px
                 height: 16px
-                background-size: 16px
+                mask-size: 16px
                 top: 3px
                 animation: none
             &.spinning

@@ -399,7 +399,7 @@
 
         &.left-panel-visible
             .main-container .editor-container .editor
-                border-left: 1px solid var(--tab-bar-border-bottom-color)
+                border-left: 1px solid var(--border)
         &.tab-bar-visible
             .main-container .editor-container .editor
                 height: calc(100% - var(--tab-bar-height))

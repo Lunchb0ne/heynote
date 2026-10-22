@@ -188,104 +188,94 @@
 <style scoped lang="sass">
     .status
         box-sizing: border-box
-        height: 22px
+        height: var(--status-bar-height)
         width: 100%
-        background: var(--status-bar-background)
-        color: var(--status-bar-color)
-        font-family: "Open Sans"
+        background: var(--fill-25)
+        border-top: 1px solid var(--border)
+        color: var(--text-600)
         font-size: 12px
-        padding-left: 0px
-        padding-right: 0px
+        padding: 0 4px
         display: flex
         flex-direction: row
         align-items: center
         user-select: none
         white-space: nowrap
         overflow: hidden
-
         .spacer
             flex-grow: 1
         
         .status-block
             box-sizing: border-box
             height: 22px
-            padding: 4px 10px
+            line-height: 22px
+            padding: 0 8px
+            margin: 0 1px
+            border-radius: 6px
             cursor: default
-            &:first-child
-                padding-left: 12px
-            &:last-child
-                padding-right: 12px
             &.clickable
                 cursor: pointer
                 &:hover
-                    background-color: rgba(255,255,255, 0.1)
+                    background-color: var(--fill-100)
+                    color: var(--text)
+            // icons are SVG masks painted in the current text color
             .icon
                 display: block
                 width: 14px
                 height: 22px
-                +dark-mode
-                    opacity: 0.9
-        .line-number
-            color: rgba(255, 255, 255, 0.7)
-            .num
-                color: rgba(255, 255, 255, 1.0)
-            +dark-mode
-                color: rgba(255, 255, 255, 0.55)
-                .num
-                    color: rgba(255, 255, 255, 0.75)
+                background-color: currentColor
+        .line-number .num
+            color: var(--text)
         .lang .auto
-            color: rgba(255, 255, 255, 0.7)
-            +dark-mode
-                color: rgba(255, 255, 255, 0.55)
+            color: var(--text-400)
         
         .sidebar
             padding-top: 0
             padding-bottom: 0
             .icon
-                background-size: 15px
-                background-repeat: no-repeat
-                background-position: center center
-                background-image: url("@/assets/icons/sidebar.svg")
+                mask-size: 15px
+                mask-repeat: no-repeat
+                mask-position: center center
+                mask-image: url("@/assets/icons/sidebar.svg")
         
         .format
             padding-top: 0
             padding-bottom: 0
             .icon
-                background-size: 16px
-                background-repeat: no-repeat
-                background-position: center center
-                background-image: url("@/assets/icons/format.svg")
+                mask-size: 16px
+                mask-repeat: no-repeat
+                mask-position: center center
+                mask-image: url("@/assets/icons/format.svg")
 
         .spellcheck
             padding-top: 0
             padding-bottom: 0
             opacity: 1.0
             .icon
-                background-size: 13px
-                background-repeat: no-repeat
-                background-position: center center
-                background-image: url("@/assets/icons/spellcheck-off.svg")
+                mask-size: 13px
+                mask-repeat: no-repeat
+                mask-position: center center
+                mask-image: url("@/assets/icons/spellcheck-off.svg")
             &.spellcheck-enabled .icon
-                background-image: url("@/assets/icons/spellcheck.svg")
+                mask-image: url("@/assets/icons/spellcheck.svg")
         
         .pin
             padding-top: 0
             padding-bottom: 0
             .icon   
-                background-size: 13px
-                background-repeat: no-repeat
-                background-position: center center
-                background-image: url("@/assets/icons/pin.svg")
+                mask-size: 13px
+                mask-repeat: no-repeat
+                mask-position: center center
+                mask-image: url("@/assets/icons/pin.svg")
                 &.pinned
-                    background-image: url("@/assets/icons/pin-pinned.svg")
+                    mask-image: url("@/assets/icons/pin-pinned.svg")
         
         .settings
             padding-top: 0
             padding-bottom: 0
             .icon
-                background-size: 13px
-                background-repeat: no-repeat
-                background-position: center center
-                background-image: url("@/assets/icons/settings.svg")
+                mask-size: 13px
+                mask-repeat: no-repeat
+                mask-position: center center
+                mask-image: url("@/assets/icons/settings.svg")
 
 </style>

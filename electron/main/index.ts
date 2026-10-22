@@ -5,7 +5,7 @@ import fs from "fs"
 
 import { 
     WINDOW_CLOSE_EVENT, WINDOW_FULLSCREEN_STATE, WINDOW_FOCUS_STATE, FOCUS_EDITOR_EVENT, SETTINGS_CHANGE_EVENT,
-    TITLE_BAR_BG_LIGHT, TITLE_BAR_BG_LIGHT_BLURRED, TITLE_BAR_BG_DARK, TITLE_BAR_BG_DARK_BLURRED,
+    TITLE_BAR_BG_LIGHT, TITLE_BAR_BG_DARK,
     SCRATCH_FILE_NAME, SAVE_TABS_STATE, LOAD_TABS_STATE, CONTEXT_MENU_CLOSED, GET_SYSTEM_LOCALE,
     LIBRARY_SEARCH_START, LIBRARY_SEARCH_CANCEL, LIBRARY_SEARCH_MATCH, LIBRARY_SEARCH_DONE, LIBRARY_SEARCH_ERROR,
 } from '@/src/common/constants'
@@ -157,6 +157,8 @@ function wasOpenedAtLogin() {
     return false
 }
 
+const windowBg = () => nativeTheme.shouldUseDarkColors ? TITLE_BAR_BG_DARK : TITLE_BAR_BG_LIGHT
+
 async function createWindow() {
     // read any stored window settings from config, or use defaults
     let windowBounds = {
@@ -189,7 +191,8 @@ async function createWindow() {
     win = new BrowserWindow(Object.assign({
         title: 'heynote',
         icon,
-        backgroundColor: nativeTheme.shouldUseDarkColors ? '#262B37' : '#FFFFFF',
+        backgroundColor: windowBg(),
+        ...(isMac && CONFIG.get("settings.translucentWindow") ? { vibrancy: "under-window" as const, backgroundColor: "#00000000" } : {}),
         accentColor: undefined,
         show: !hideOnStartup,
         // We can't set fullscreen:true when hideOnStartup is true, because it will cancel out the show:false option
@@ -210,7 +213,7 @@ async function createWindow() {
         trafficLightPosition: { x: 8, y: 8 },
         ...(!isMac ? {
             titleBarOverlay: {
-                color: nativeTheme.shouldUseDarkColors ? TITLE_BAR_BG_DARK : TITLE_BAR_BG_LIGHT,
+                color: windowBg(),
                 symbolColor: nativeTheme.shouldUseDarkColors ? '#aaa' : '#333',
             }, 
         } : {})
@@ -295,26 +298,10 @@ async function createWindow() {
     win.on("focus", () => {
         // send a message to the renderer to update the window title
         win?.webContents.send(WINDOW_FOCUS_STATE, true)
-
-        // update titleBarOverlay colors on Windows/Linux
-        if (!isMac) {
-            win?.setTitleBarOverlay({
-                color: nativeTheme.shouldUseDarkColors ? TITLE_BAR_BG_DARK : TITLE_BAR_BG_LIGHT,
-                symbolColor: nativeTheme.shouldUseDarkColors ? '#aaa' : '#333',
-            })
-        }
     })
     win.on("blur", () => {
         // send a message to the renderer to update the window title
         win?.webContents.send(WINDOW_FOCUS_STATE, false)
-
-        // update titleBarOverlay colors on Windows/Linux
-        if (!isMac) {
-            win?.setTitleBarOverlay({
-                color: nativeTheme.shouldUseDarkColors ? TITLE_BAR_BG_DARK_BLURRED : TITLE_BAR_BG_LIGHT_BLURRED,
-                symbolColor: nativeTheme.shouldUseDarkColors ? '#aaa' : '#333',
-            })
-        }
     })
 
     if (process.env.VITE_DEV_SERVER_URL) { // electron-vite-vue#298
@@ -540,7 +527,7 @@ ipcMain.handle('dark-mode:set', (event, mode) => {
     // update titleBarOverlay colors on Windows/Linux
     if (!isMac) {
         win?.setTitleBarOverlay({
-            color: nativeTheme.shouldUseDarkColors ? TITLE_BAR_BG_DARK : TITLE_BAR_BG_LIGHT,
+            color: windowBg(),
             symbolColor: nativeTheme.shouldUseDarkColors ? '#aaa' : '#333',
         })
     }

@@ -277,16 +277,12 @@
     .folder-select-container
         width: 100%
         overflow-y: auto
-        background: #fff
-        border: 1px solid #ccc
-        border-radius: 2px
-        padding: 5px 5px
+        +rc-input
+        border-radius: 8px
+        padding: 4px
+        box-sizing: border-box
         text-align: left
-        &:focus, &:focus-within
-            outline: none
-            border: 1px solid #fff
-            outline: 2px solid #48b57e
-        +dark-mode
-            background: #262626
-            border: 1px solid #363636
+        &:focus-within
+            border-color: var(--border-200)
+            background: var(--fill-100)
 </style>

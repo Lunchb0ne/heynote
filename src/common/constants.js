@@ -37,10 +37,9 @@ export const UPDATE_CHECK_FOR_UPDATES = "auto-update:checkForUpdates"
 
 export const FOLD_LABEL_LENGTH = 50
 
-export const TITLE_BAR_BG_LIGHT = "#ebebeb"
-export const TITLE_BAR_BG_LIGHT_BLURRED = "#e7e7e7"
-export const TITLE_BAR_BG_DARK = "#1b1c1d"
-export const TITLE_BAR_BG_DARK_BLURRED = "#121313"
+// native window colors (needed before CSS loads), keep in sync with --bg-rgb in src/css/base.sass
+export const TITLE_BAR_BG_LIGHT = "#ffffff"
+export const TITLE_BAR_BG_DARK = "#1c1c1e"
 
 export const IMAGE_MIME_TYPES = [
     "image/png",

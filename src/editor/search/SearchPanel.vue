@@ -275,53 +275,31 @@
 
 <style lang="sass" scoped>
     input[type="text"]
-        background: #fff
-        padding: 4px 5px
-        border: 1px solid #ccc
+        +rc-input
+        padding: 4px 8px
         box-sizing: border-box
-        border-radius: 2px
         width: 300px
-        &:focus
-            outline: none
-            border: 1px solid #fff
-            outline: 2px solid #48b57e
-        &::placeholder
-            color: rgba(0,0,0, 0.6)
-        +dark-mode
-            background: #3b3b3b
-            color: rgba(255,255,255, 0.9)
-            border: 1px solid #4c4c4c
-            &:focus
-                border: 1px solid #3b3b3b
-            &::placeholder
-                color: rgba(255,255,255, 0.6)
         +webapp-mobile
             font-size: 16px
             max-width: 100%
     
     .search-panel
         position: absolute
-        top: 0
         right: 16px
         //width: 400px
-        background-color: var(--panel-background)
-        padding: 10px 4px 10px 3px
-        border-radius: 0 0 5px 5px
+        +rc-popover
+        top: 8px
+        padding: 8px 6px 8px 5px
         display: flex
         flex-direction: row
         align-items: stretch
-        box-shadow: 0 0 10px rgba(0,0,0,0.3)
         font-size: 13px
-        +dark-mode
-            box-shadow: 0 0 10px rgba(0,0,0,0.5)
-            color: rgba(255,255,255, 0.7)
-            //border: 1px solid #272727
         
         .expand-button
             border: none
             background: url('@/assets/icons/caret-right-alpha50.svg') no-repeat center center
             background-size: 16px
-            border-radius: 2px
+            border-radius: 6px
             cursor: pointer
             width: 22px
             margin-right: 3px
@@ -329,11 +307,9 @@
                 background-image: url('@/assets/icons/caret-right-white-alpha50.svg')
             &:focus-visible
                 outline: none
-                border: 2px solid #48b57e
+                border: 2px solid var(--text-400)
             &:hover
-                background-color: rgba(0,0,0, 0.1)
-                +dark-mode
-                    background-color: rgba(255,255,255, 0.15)
+                background-color: var(--fill-100)
         &.expanded .expand-button
             background-image: url('@/assets/icons/caret-down-alpha50.svg')
             +dark-mode
@@ -371,15 +347,13 @@
             background-size: 16px
             height: 28px
             width: 24px
-            border-radius: 2px
+            border-radius: 6px
             cursor: pointer
             &:focus-visible
                 outline: none
-                border: 2px solid #48b57e
+                border: 2px solid var(--text-400)
             &:hover
-                background-color: rgba(0,0,0, 0.1)
-                +dark-mode
-                    background-color: rgba(255,255,255, 0.15)
+                background-color: var(--fill-100)
             &.close
                 background-image: url('@/assets/icons/close.svg')
                 +dark-mode

@@ -1,7 +1,61 @@
 import { EditorView } from '@codemirror/view';
+import { HighlightStyle } from '@codemirror/language';
+import { tags } from '@lezer/highlight';
 
 
+// Raycast-style editor, shared by the light and dark themes. Colors come from the CSS custom
+// properties in src/css/base.sass, and the editor never paints its own background so the window
+// background (or native vibrancy on macOS) shows through.
 export const heynoteBase = EditorView.theme({
+    "&": {
+        color: "var(--text)",
+        backgroundColor: "transparent",
+    },
+    ".cm-content": {
+        caretColor: "var(--text)",
+        paddingTop: 4,
+    },
+    ".cm-cursor, .cm-dropCursor": {
+        borderLeftColor: "var(--text)",
+        borderLeftWidth: '2px',
+        paddingTop: '4px',
+        marginTop: '-2px',
+        boxSizing: 'content-box',
+    },
+    ".cm-activeLine": { backgroundColor: "var(--fill-25)" },
+    ".cm-selectionMatch": { backgroundColor: "var(--fill-100)" },
+    "&.cm-focused .cm-matchingBracket": {
+        backgroundColor: "var(--fill-100)",
+        outline: "1px solid var(--border-200)",
+        color: "inherit",
+    },
+    "&.cm-focused .cm-nonmatchingBracket": {
+        outline: "1px solid var(--accent)",
+    },
+    ".cm-gutters": {
+        backgroundColor: "transparent",
+        color: "var(--text-250)",
+        border: "none",
+        padding: '0 2px 0 4px',
+        userSelect: 'none',
+    },
+    ".cm-activeLineGutter": {
+        backgroundColor: "transparent",
+        color: "var(--text-600)",
+    },
+    ".cm-foldPlaceholder": {
+        backgroundColor: "transparent",
+        border: "none",
+        color: "var(--text-600)",
+    },
+    ".cm-searchMatch": { backgroundColor: "rgb(255 197 49 / 0.3)" },
+    ".cm-searchMatch-selected": {
+        backgroundColor: "rgb(255 197 49 / 0.6)",
+        outline: "1px solid rgb(255 197 49)",
+    },
+    ".cm-taskmarker-toggle input[type=checkbox]": {
+        accentColor: "var(--accent)",
+    },
     ".cm-line": {
         padding: "0 6px",
     },
@@ -11,61 +65,9 @@ export const heynoteBase = EditorView.theme({
     ".cm-panels.cm-panels-top": {
         borderBottom: "none",
     },
-    ".cm-panels .cm-panel": {
-        
-    },
-    '.cm-panels .cm-textfield': {
-        fontSize: "1em",
-        borderRadius: "2px",
-    },
-    '.cm-panels .cm-button': {
-        border: "none",
-        borderRadius: "2px",
-        fontSize: "1em",
-        cursor: "pointer",
-        padding: "2px 12px",
-    },
-    '.cm-panels .cm-button:focus': {
-        border: "none",
-        outline: "2px solid #48b57e",
-        outlineOffset: "1px",
-    },
-    ".cm-panel.cm-search label": {
-        fontSize: "1em",
-    },
-    ".cm-panel.cm-search input[type=checkbox]": {
-        position: "relative",
-        top: "2px",
-    },
-    ".cm-panel.cm-search input[type=checkbox]:focus-visible": {
-        outline: "2px auto #48b57e",
-        outlineOffset: "2px",
-        //borderRadius: "3px",
-    },
-    ".cm-panel.cm-search [name=close]" : {
-        fontSize: "18px",
-        right: "4px",
-        top: "4px",
-        width: "22px",
-        height: "22px",
-        border: "2px solid transparent",
-        borderRadius: "2px",
-        cursor: "pointer",
-    },
-    ".cm-panel.cm-search [name=close]:focus-visible" : {
-        border: "2px solid #48b57e",
-        outline: "none",
-    },
 
     "&.cm-editor.cm-focused": {
         outline: "none",
-    },
-    ".cm-content": {
-        paddingTop: 4,
-    },
-    '.cm-gutters': {
-        padding: '0 2px 0 4px',
-        userSelect: 'none',
     },
     '.cm-foldGutter': {
         marginLeft: '0px',
@@ -79,12 +81,6 @@ export const heynoteBase = EditorView.theme({
     },
     '.cm-gutters:hover .cm-gutterElement span[title*="Fold"]': {
         opacity: 1,
-    },
-    '.cm-cursor, .cm-dropCursor': {
-        borderLeftWidth:'2px', 
-        paddingTop: '4px',
-        marginTop: '-2px',
-        boxSizing: 'content-box',
     },
     '.cm-highlightSpace': {
         'background-image': 'radial-gradient(circle at 50% 54%, #aaaaaa60 11%, transparent 5%)',
@@ -101,6 +97,10 @@ export const heynoteBase = EditorView.theme({
     '.heynote-blocks-layer .block-even, .heynote-blocks-layer .block-odd': {
         width: '100%',
         boxSizing: 'content-box',
+        borderTop: '1px solid var(--border)',
+    },
+    '.heynote-blocks-layer .block-odd': {
+        background: 'var(--fill-25)',
     },
     '.heynote-blocks-layer .block-even:first-child': {
         borderTop: 'none',
@@ -116,12 +116,10 @@ export const heynoteBase = EditorView.theme({
         position: "relative",
     },
     '.heynote-math-result .inner': {
-        background: '#48b57e',
-        //background: '#4892b5',
-        color: '#fff',
+        background: 'var(--fill-100)',
+        color: 'var(--text)',
+        borderRadius: '6px',
         padding: '0px 4px',
-        borderRadius: '2px',
-        boxShadow: '0 0 3px rgba(0,0,0, 0.1)',
         cursor: 'pointer',
         whiteSpace: "nowrap",
     },
@@ -133,7 +131,7 @@ export const heynoteBase = EditorView.theme({
         width: "60px",
         transition: "opacity 500ms",
         transitionDelay: "1000ms",
-        color: "rgba(0,0,0, 0.8)",
+        color: "var(--text-600)",
     },
     '.heynote-math-result-copied.fade-out': {
         opacity: 0,
@@ -152,14 +150,33 @@ export const heynoteBase = EditorView.theme({
         verticalAlign: "-0.08em",
     },
 
-    ".cm-searchMatch": { backgroundColor: "#ffff00" },
-    ".cm-searchMatch-selected": {
-        backgroundColor: "#ffaa20",
-        outline: "1px solid #e46d00",
-    },
-
     ".cm-foldPlaceholder .created-time": {
         float: "right",
         marginRight: "6px",
     },
 })
+
+// syntax highlighting with the token roles of ray.so's code themes; light.js and dark.js supply the colors
+export function raycastHighlightStyle(c) {
+    return HighlightStyle.define([
+        { tag: [tags.keyword, tags.operatorKeyword, tags.modifier, tags.controlKeyword, tags.tagName], color: c.keyword },
+        { tag: [tags.string, tags.special(tags.string), tags.regexp, tags.character, tags.monospace, tags.quote], color: c.string },
+        { tag: [tags.comment, tags.meta, tags.processingInstruction], color: c.comment, fontStyle: "italic" },
+        { tag: [tags.number, tags.bool, tags.atom, tags.null, tags.changed], color: c.number },
+        { tag: [tags.function(tags.variableName), tags.function(tags.propertyName), tags.inserted], color: c.function },
+        {
+            tag: [tags.propertyName, tags.attributeName, tags.labelName, tags.typeName, tags.className, tags.namespace,
+                  tags.constant(tags.name), tags.standard(tags.name), tags.self, tags.escape, tags.color],
+            color: c.constant,
+        },
+        { tag: [tags.operator, tags.separator, tags.angleBracket], color: c.punctuation },
+        { tag: [tags.paren, tags.brace, tags.squareBracket, tags.contentSeparator], color: "var(--text-600)" },
+        { tag: [tags.link, tags.url], color: c.punctuation, textDecoration: "underline", textUnderlinePosition: "under" },
+        { tag: tags.deleted, color: c.deleted },
+        { tag: tags.invalid, color: c.deleted, textDecoration: "underline wavy" },
+        { tag: tags.heading, fontWeight: "bold" },
+        { tag: tags.strong, fontWeight: "bold" },
+        { tag: tags.emphasis, fontStyle: "italic" },
+        { tag: tags.strikethrough, textDecoration: "line-through" },
+    ])
+}
