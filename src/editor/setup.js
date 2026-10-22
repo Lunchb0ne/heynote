@@ -9,6 +9,10 @@ import { lintKeymap } from '@codemirror/lint';
 
 import { crosshairCursor as customCrosshairCursor} from "./crosshair-cursor.js"
 
+// the same objects every time, so typing doesn't recompute the editor's attributes
+const hasSelectionAttrs = { class: "heynote-has-selection" }
+const noAttrs = {}
+
 // (The superfluous function calls around the list of extensions work
 // around current limitations in tree-shaking software.)
 /**
@@ -74,6 +78,12 @@ const customSetup = /*@__PURE__*/(() => [
     //closeBrackets(),
     //autocompletion(),
     highlightActiveLine(),
+    // the current line highlight (base.js) is for a single plain cursor; with a selection or several
+    // cursors it would only sit on top of the selection
+    EditorView.editorAttributes.compute(["selection"], state => {
+        const { ranges } = state.selection
+        return ranges.length > 1 || !ranges[0].empty ? hasSelectionAttrs : noAttrs
+    }),
     //highlightSelectionMatches(),
     EditorView.lineWrapping,
     scrollPastEnd(),

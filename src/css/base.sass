@@ -37,9 +37,14 @@ html[platform=mac]
     --bg-rgb: 28 28 30
     --text-rgb: 255 255 255
 
+// band behind the editor block holding the cursor, the fainter tint on every other block, and the
+// current line's pill (a step above the band)
 :root
     --focus-band: var(--fill-50)
     --block-alt: rgb(var(--text-rgb) / 0.03)
+    --active-line: rgb(var(--text-rgb) / 0.07)
+:root[theme='light']
+    --active-line: rgb(var(--text-rgb) / 0.05)
 
 // native vibrancy (set by the main process on macOS) shows through a light tint of the window color
 html[translucent]

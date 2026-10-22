@@ -22,7 +22,25 @@ export const heynoteBase = EditorView.theme({
         marginTop: '-2px',
         boxSizing: 'content-box',
     },
-    ".cm-activeLine": { backgroundColor: "var(--fill-25)" },
+    // the current line: a rounded pill one step above the block band, inset 8px from the right. It's
+    // drawn behind the text (the line's own stacking context keeps it above the band), so the line
+    // itself keeps its width and nothing re-wraps
+    ".cm-activeLine": {
+        backgroundColor: "transparent",
+    },
+    "&.cm-focused:not(.heynote-has-selection) .cm-activeLine": {
+        position: "relative",
+        zIndex: 0,
+    },
+    "&.cm-focused:not(.heynote-has-selection) .cm-activeLine::before": {
+        content: '""',
+        position: "absolute",
+        inset: "0 8px 0 0",
+        zIndex: -1,
+        borderRadius: "6px",
+        backgroundColor: "var(--active-line)",
+        pointerEvents: "none",
+    },
     ".cm-selectionMatch": { backgroundColor: "var(--fill-100)" },
     "&.cm-focused .cm-matchingBracket": {
         backgroundColor: "var(--fill-100)",
