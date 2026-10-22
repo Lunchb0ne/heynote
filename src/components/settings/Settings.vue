@@ -648,8 +648,8 @@
                     overflow-y: auto
                     position: relative
                     select
-                        height: 22px
-                        margin: 4px 0
+                        +rc-select
+                        margin: 2px 0
                     .row
                         display: flex
                         .entry
@@ -685,9 +685,13 @@
                             width: 100%
                             .file-path
                                 display: flex
+                                margin-top: 6px
                                 > button
+                                    +rc-button
                                     flex-shrink: 0
-                                    padding: 3px 8px
+                                    &:disabled
+                                        cursor: default
+                                        opacity: 0.4
                                 .path
                                     flex-grow: 1
                                     margin-left: 10px
@@ -708,7 +712,6 @@
                 padding: 10px 20px
                 .close
                     +rc-button
-                    height: 28px
-                    padding: 0 14px
-                    font-weight: 600
+                    +rc-button-primary
+                    padding: 0 16px
 </style>

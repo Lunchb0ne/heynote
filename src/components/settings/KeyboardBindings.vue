@@ -162,40 +162,40 @@
             margin: 0
         .button-container
             .add-keybinding
-                font-size: 12px
-                height: 26px
-                cursor: pointer
-                
-    
+                +rc-button
+
+
+    // a grouped list: one rounded container, hairlines between rows
     table
         width: 100%
-        background: #f1f1f1
-        border: 2px solid #f1f1f1
-        +dark-mode
-            background: #3c3c3c
-            background: #333
-            border: 2px solid #3c3c3c
+        border-collapse: separate
+        border-spacing: 0
+        border: 1px solid var(--border)
+        border-radius: 10px
+        overflow: hidden
         ::v-deep(tr)
-            background: #fff
-            border-bottom: 2px solid #f1f1f1
-            +dark-mode
-                background: #333
-                border-bottom: 2px solid #3c3c3c
             &.ghost
-                background: #48b57e
-                color: #fff
-                +dark-mode
-                    background: #1b6540
+                background: color-mix(in srgb, var(--accent) 18%, transparent)
             th
                 text-align: left
+                font-size: 11px
                 font-weight: 600
+                letter-spacing: 0.04em
+                text-transform: uppercase
+                color: var(--text-400)
+                background: var(--fill-25)
             th, td
-                padding: 8px
+                padding: 9px 12px
+                border-bottom: 1px solid var(--border)
                 &.actions
-                    padding: 6px
+                    padding: 6px 12px
                     button
-                        height: 20px
+                        height: 22px
                         font-size: 11px
+            td.source
+                color: var(--text-600)
+            &:last-child td
+                border-bottom: none
         
         tbody
             margin-bottom: 20px
