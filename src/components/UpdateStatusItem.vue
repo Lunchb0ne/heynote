@@ -185,7 +185,8 @@
             mask-position: center center
             mask-image: url("@/assets/icons/update.svg")
             animation-name: spin
-            animation-duration: 2000ms
+            // a faster spinner makes the check feel faster
+            animation-duration: 1000ms
             animation-iteration-count: infinite
             animation-timing-function: linear
             animation-play-state: paused

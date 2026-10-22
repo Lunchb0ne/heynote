@@ -194,7 +194,7 @@
         border-top: 1px solid var(--border)
         color: var(--text-600)
         font-size: 12px
-        padding: 0 4px
+        padding: 0 8px
         display: flex
         flex-direction: row
         align-items: center
@@ -206,14 +206,15 @@
         
         .status-block
             box-sizing: border-box
-            height: 22px
-            line-height: 22px
-            padding: 0 8px
+            height: 24px
+            line-height: 24px
+            padding: 0 9px
             margin: 0 1px
             border-radius: 6px
             cursor: default
             &.clickable
                 cursor: pointer
+                +press
                 &:hover
                     background-color: var(--fill-100)
                     color: var(--text)
@@ -221,8 +222,10 @@
             .icon
                 display: block
                 width: 14px
-                height: 22px
+                height: 24px
                 background-color: currentColor
+                mask-repeat: no-repeat
+                mask-position: center center
         .line-number .num
             color: var(--text)
         .lang .auto
@@ -233,8 +236,6 @@
             padding-bottom: 0
             .icon
                 mask-size: 15px
-                mask-repeat: no-repeat
-                mask-position: center center
                 mask-image: url("@/assets/icons/sidebar.svg")
         
         .format
@@ -242,8 +243,6 @@
             padding-bottom: 0
             .icon
                 mask-size: 16px
-                mask-repeat: no-repeat
-                mask-position: center center
                 mask-image: url("@/assets/icons/format.svg")
 
         .spellcheck
@@ -252,8 +251,6 @@
             opacity: 1.0
             .icon
                 mask-size: 13px
-                mask-repeat: no-repeat
-                mask-position: center center
                 mask-image: url("@/assets/icons/spellcheck-off.svg")
             &.spellcheck-enabled .icon
                 mask-image: url("@/assets/icons/spellcheck.svg")
@@ -261,10 +258,8 @@
         .pin
             padding-top: 0
             padding-bottom: 0
-            .icon   
+            .icon
                 mask-size: 13px
-                mask-repeat: no-repeat
-                mask-position: center center
                 mask-image: url("@/assets/icons/pin.svg")
                 &.pinned
                     mask-image: url("@/assets/icons/pin-pinned.svg")
@@ -274,8 +269,6 @@
             padding-bottom: 0
             .icon
                 mask-size: 13px
-                mask-repeat: no-repeat
-                mask-position: center center
                 mask-image: url("@/assets/icons/settings.svg")
 
 </style>
