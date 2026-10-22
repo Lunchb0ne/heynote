@@ -15,7 +15,7 @@
     const defaultFontSize = window.heynote.defaultFontSize
     const defaultDefaultBlockLanguage = "text"
     const defaultDefaultBlockLanguageAutoDetect = true
-    
+
     export default {
         props: {
             initialKeymap: String,
@@ -70,7 +70,7 @@
                 cursorBlinkRate: this.initialSettings.cursorBlinkRate ?? 1000,
                 languageOptions: LANGUAGES.map(l => {
                     return {
-                        "value": l.token, 
+                        "value": l.token,
                         "name": l.token == "text" ? l.name + " (default)" : l.name,
                     }
                 }).sort((a, b) => {
@@ -80,6 +80,18 @@
                 defaultBlockLanguageAutoDetect: this.initialSettings.defaultBlockLanguageAutoDetect === false ? false : defaultDefaultBlockLanguageAutoDetect,
 
                 activeTab: "general",
+                tabs: [
+                    { tab: "general", name: "General" },
+                    { tab: "editing", name: "Editing" },
+                    { tab: "appearance", name: "Appearance" },
+                    { tab: "keyboard-bindings", name: "Key Bindings" },
+                    { tab: "updates", name: window.heynote.platform.isWebApp ? "Version" : "Updates" },
+                ],
+                themes: [
+                    { value: "system", name: "Auto" },
+                    { value: "light", name: "Light" },
+                    { value: "dark", name: "Dark" },
+                ],
                 isWebApp: window.heynote.platform.isWebApp,
                 customBufferLocation: !!this.initialSettings.bufferPath,
                 // the saved fonts are listed even before (or without) queryLocalFonts, so the selects show them
@@ -120,6 +132,10 @@
 
         computed: {
             ...mapStores(useSettingsStore, useHeynoteStore),
+
+            paneTitle() {
+                return this.tabs.find(t => t.tab === this.activeTab).name
+            },
         },
 
         methods: {
@@ -198,423 +214,338 @@
         <div class="dialog">
             <div class="dialog-content">
                 <nav class="sidebar">
-                    <h1>Settings</h1>
                     <ul>
-                        <TabListItem 
-                            name="General" 
-                            tab="general" 
-                            :activeTab="activeTab" 
-                            @click="activeTab = 'general'"
-                        />
-                        <TabListItem 
-                            name="Editing" 
-                            tab="editing"
-                            :activeTab="activeTab" 
-                            @click="activeTab = 'editing'"
-                        />
-                        <TabListItem 
-                            name="Appearance" 
-                            tab="appearance"
-                            :activeTab="activeTab" 
-                            @click="activeTab = 'appearance'"
-                        />
-                        <TabListItem 
-                            name="Key Bindings" 
-                            tab="keyboard-bindings" 
-                            :activeTab="activeTab" 
-                            @click="activeTab = 'keyboard-bindings'"
-                        />
-                        <TabListItem 
-                            :name="isWebApp ? 'Version' : 'Updates'" 
-                            tab="updates" 
-                            :activeTab="activeTab" 
-                            @click="activeTab = 'updates'"
+                        <TabListItem
+                            v-for="t in tabs"
+                            :key="t.tab"
+                            :name="t.name"
+                            :tab="t.tab"
+                            :activeTab="activeTab"
+                            @click="activeTab = t.tab"
                         />
                     </ul>
                 </nav>
                 <div class="settings-content">
+                    <h1 class="pane-title">{{ paneTitle }}</h1>
+
                     <TabContent tab="general" :activeTab="activeTab">
-                        <div class="row" v-if="!isWebApp">
-                            <div class="entry">
-                                <h2>Global Keyboard Shortcut</h2>
-                                <label class="keyboard-shortcut-label">
-                                    <input 
-                                        type="checkbox" 
-                                        v-model="enableGlobalHotkey" 
+                        <section v-if="!isWebApp">
+                            <h2>Global Keyboard Shortcut</h2>
+                            <div class="card">
+                                <label class="setting">
+                                    <span class="text">
+                                        Enable Global Hotkey
+                                        <small>Show and hide Heynote from any app</small>
+                                    </span>
+                                    <input type="checkbox" v-model="enableGlobalHotkey" @change="updateSettings" />
+                                </label>
+                                <div class="setting hotkey">
+                                    <KeyboardHotkey
+                                        :disabled="!enableGlobalHotkey"
+                                        v-model="globalHotkey"
                                         @change="updateSettings"
                                     />
-                                    Enable Global Hotkey
-                                </label>
-                                
-                                <KeyboardHotkey 
-                                    :disabled="!enableGlobalHotkey"
-                                    v-model="globalHotkey"
-                                    @change="updateSettings"
-                                />
-                            </div>
-                        </div>
-                        <div class="row" v-if="!isWebApp">
-                            <div class="entry">
-                                <h2>Window / Application</h2>
-                                <label v-if="isMac">
-                                    <input
-                                        type="checkbox"
-                                        v-model="showInDock"
-                                        @change="updateSettings"
-                                    />
-                                    Show in dock
-                                </label>
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        :disabled="!showInDock"
-                                        v-model="showInMenu"
-                                        @change="updateSettings"
-                                    />
-                                    <template v-if="isMac">
-                                        Show in menu bar
-                                    </template>
-                                    <template v-else>
-                                        Show in system tray
-                                    </template>
-                                </label>
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        v-model="alwaysOnTop"
-                                        @change="updateSettings"
-                                    />
-                                    Always on top
-                                </label>
-                                <label v-if="!isLinux">
-                                    <input
-                                        type="checkbox"
-                                        v-model="openAtLogin"
-                                        @change="updateSettings"
-                                    />
-                                    Launch at login
-                                </label>
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        v-model="startHidden"
-                                        @change="updateSettings"
-                                    />
-                                    Start hidden
-                                </label>
-                            </div>
-                        </div>
-                        <div class="row" v-if="!isWebApp">
-                            <div class="entry buffer-location">
-                                <h2>Buffer Files Path</h2>
-                                <label class="keyboard-shortcut-label">
-                                    <input 
-                                        type="checkbox" 
-                                        v-model="customBufferLocation" 
-                                        @change="onCustomBufferLocationChange"
-                                    />
-                                    Use custom location for the buffer files
-                                </label>
-                                <div class="file-path">
-                                    <button
-                                        :disabled="!customBufferLocation"
-                                        @click="selectBufferLocation"
-                                    >Select Directory</button>
-                                    <span class="path" v-show="customBufferLocation && bufferPath">{{ bufferPath }}</span>
                                 </div>
                             </div>
-                        </div>
+                        </section>
+                        <section v-if="!isWebApp">
+                            <h2>Window & Application</h2>
+                            <div class="card">
+                                <label class="setting" v-if="isMac">
+                                    <span class="text">Show in dock</span>
+                                    <input type="checkbox" v-model="showInDock" @change="updateSettings" />
+                                </label>
+                                <label class="setting">
+                                    <span class="text">{{ isMac ? "Show in menu bar" : "Show in system tray" }}</span>
+                                    <input type="checkbox" :disabled="!showInDock" v-model="showInMenu" @change="updateSettings" />
+                                </label>
+                                <label class="setting">
+                                    <span class="text">Always on top</span>
+                                    <input type="checkbox" v-model="alwaysOnTop" @change="updateSettings" />
+                                </label>
+                                <label class="setting" v-if="!isLinux">
+                                    <span class="text">Launch at login</span>
+                                    <input type="checkbox" v-model="openAtLogin" @change="updateSettings" />
+                                </label>
+                                <label class="setting">
+                                    <span class="text">
+                                        Start hidden
+                                        <small>Open in the background, ready for the hotkey</small>
+                                    </span>
+                                    <input type="checkbox" v-model="startHidden" @change="updateSettings" />
+                                </label>
+                            </div>
+                        </section>
+                        <section v-if="!isWebApp" class="buffer-location">
+                            <h2>Buffer Files</h2>
+                            <div class="card">
+                                <label class="setting">
+                                    <span class="text">
+                                        Use custom location for the buffer files
+                                        <small>By default they live in Heynote's own app data folder</small>
+                                    </span>
+                                    <input type="checkbox" v-model="customBufferLocation" @change="onCustomBufferLocationChange" />
+                                </label>
+                                <div class="setting file-path" v-if="customBufferLocation">
+                                    <span class="path" :title="bufferPath">{{ bufferPath || "No folder selected" }}</span>
+                                    <button @click="selectBufferLocation">Select Directory</button>
+                                </div>
+                            </div>
+                        </section>
                     </TabContent>
 
                     <TabContent tab="editing" :activeTab="activeTab">
-                        <div class="row">
-                            <div class="entry">
-                                <h2>Input settings</h2>
-                                <label>
-                                    <input 
-                                        type="checkbox"
-                                        v-model="bracketClosing"
-                                        @change="updateSettings"
-                                    />
-                                    Auto-close brackets and quotation marks
+                        <section>
+                            <h2>Input</h2>
+                            <div class="card">
+                                <label class="setting">
+                                    <span class="text">Auto-close brackets and quotation marks</span>
+                                    <input type="checkbox" v-model="bracketClosing" @change="updateSettings" />
                                 </label>
-                            </div>  
-                        </div>
-                        <div class="row">
-                            <div class="entry">
-                                <h2>Tab Size</h2>
-                                <select v-model="tabSize" @change="updateSettings" class="tab-size">
-                                    <option
-                                        v-for="size in [1, 2, 3, 4, 5, 6, 7, 8]"
-                                        :key="size"
-                                        :selected="tabSize === size"
-                                        :value="size"
-                                    >{{ size }} {{ size === 1 ? 'space' : 'spaces' }}</option>
-                                </select>
                             </div>
-                            <div class="entry">
-                                <h2>Indent Using</h2>
-                                <select v-model="indentType" @change="updateSettings" class="indent-type">
-                                    <option value="space" :selected="indentType === 'space'">Spaces</option>
-                                    <option value="tab" :selected="indentType === 'tab'">Tabs</option>
-                                </select>
+                        </section>
+                        <section>
+                            <h2>Indentation</h2>
+                            <div class="card">
+                                <label class="setting">
+                                    <span class="text">Tab size</span>
+                                    <select v-model="tabSize" @change="updateSettings" class="tab-size">
+                                        <option
+                                            v-for="size in [1, 2, 3, 4, 5, 6, 7, 8]"
+                                            :key="size"
+                                            :selected="tabSize === size"
+                                            :value="size"
+                                        >{{ size }} {{ size === 1 ? 'space' : 'spaces' }}</option>
+                                    </select>
+                                </label>
+                                <label class="setting">
+                                    <span class="text">Indent using</span>
+                                    <select v-model="indentType" @change="updateSettings" class="indent-type">
+                                        <option value="space" :selected="indentType === 'space'">Spaces</option>
+                                        <option value="tab" :selected="indentType === 'tab'">Tabs</option>
+                                    </select>
+                                </label>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="entry">
-                                <h2>Default Block Language</h2>
-                                <select v-model="defaultBlockLanguage" @change="updateSettings" class="block-language">
-                                    <template v-for="lang in languageOptions" :key="lang.value">
-                                        <option :selected="lang.value === defaultBlockLanguage" :value="lang.value">{{ lang.name }}</option>
-                                    </template>
-                                </select>
-                                <label>
+                        </section>
+                        <section>
+                            <h2>New Blocks</h2>
+                            <div class="card">
+                                <label class="setting">
+                                    <span class="text">Default block language</span>
+                                    <select v-model="defaultBlockLanguage" @change="updateSettings" class="block-language">
+                                        <template v-for="lang in languageOptions" :key="lang.value">
+                                            <option :selected="lang.value === defaultBlockLanguage" :value="lang.value">{{ lang.name }}</option>
+                                        </template>
+                                    </select>
+                                </label>
+                                <label class="setting">
+                                    <span class="text">
+                                        Auto-detection
+                                        <small>Switch a block's language to match what you type</small>
+                                    </span>
                                     <input
                                         type="checkbox"
                                         v-model="defaultBlockLanguageAutoDetect"
                                         @change="updateSettings"
                                         class="language-auto-detect"
                                     />
-                                    Auto-detection (default: on)
                                 </label>
-                            </div>  
-                        </div>
+                            </div>
+                        </section>
                     </TabContent>
 
                     <TabContent tab="appearance" :activeTab="activeTab">
-                        <div class="row">
-                            <div class="entry">
-                                <h2>Color Theme</h2>
-                                <select v-model="theme" @change="updateSettings" class="theme">
-                                    <option :selected="theme === 'system'" value="system">System</option>
-                                    <option :selected="theme === 'light'" value="light">Light</option>
-                                    <option :selected="theme === 'dark'" value="dark">Dark</option>
-                                </select>
-                                <label v-if="isMac && !isWebApp">
-                                    <input
-                                        type="checkbox"
-                                        v-model="translucentWindow"
-                                        @change="updateSettings"
-                                    />
-                                    Translucent window
+                        <section>
+                            <h2>Theme</h2>
+                            <div class="card">
+                                <div class="setting theme-setting">
+                                    <div class="theme-picker" role="radiogroup" aria-label="Color theme">
+                                        <label v-for="t in themes" :key="t.value" :class="['theme-option', t.value]">
+                                            <input type="radio" name="theme" :value="t.value" v-model="theme" @change="updateSettings" />
+                                            <span class="thumb"></span>
+                                            {{ t.name }}
+                                        </label>
+                                    </div>
+                                </div>
+                                <label class="setting" v-if="isMac && !isWebApp">
+                                    <span class="text">
+                                        Translucent window
+                                        <small>Let the desktop show through the window</small>
+                                    </span>
+                                    <input type="checkbox" v-model="translucentWindow" @change="updateSettings" />
                                 </label>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="entry">
-                                <h2>Editor Display</h2>
-                                <label>
-                                    <input 
-                                        type="checkbox" 
-                                        v-model="showLineNumberGutter" 
-                                        @change="updateSettings"
-                                    />
-                                    Show line numbers
+                        </section>
+                        <section>
+                            <h2>Editor Font</h2>
+                            <div class="card">
+                                <div
+                                    class="font-preview"
+                                    :style="{ fontFamily: `'${fontFamily}'`, fontSize: fontSize + 'px', lineHeight }"
+                                    aria-hidden="true"
+                                >The quick brown fox jumps over the lazy dog<br>0O 1lI {} [] () => != === 3.14</div>
+                                <label class="setting">
+                                    <span class="text">Font</span>
+                                    <select v-model="fontFamily" @change="updateSettings" class="font-family">
+                                        <option
+                                            v-for="[font, label] in systemFonts"
+                                            :selected="font === fontFamily"
+                                            :value="font"
+                                        >{{ label }}</option>
+                                    </select>
                                 </label>
-                                
-                                <label>
-                                    <input 
-                                        type="checkbox" 
-                                        v-model="showFoldGutter" 
-                                        @change="updateSettings"
-                                    />
-                                    Show fold gutter
+                                <label class="setting">
+                                    <span class="text">Size</span>
+                                    <select v-model="fontSize" @change="updateSettings" class="font-size">
+                                        <option
+                                            v-for="size in [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]"
+                                            :selected="size === fontSize"
+                                            :value="size"
+                                        >{{ size }}px{{ size === defaultFontSize ? " (default)" : "" }}</option>
+                                    </select>
                                 </label>
-
-                                <label>
-                                    <input 
-                                        type="checkbox" 
-                                        v-model="showWhitespace" 
-                                        @change="updateSettings"
-                                    />
-                                    Show white-space
-                                </label>
-
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        v-model="colorPreviewEnabled"
-                                        @change="updateSettings"
-                                    />
-                                    Show color previews (CSS, HTML, JavaScript, TypeScript, Vue, TSX)
-                                </label>
-                            </div>
-                        </div>
-                        <div class="row font-settings">
-                            <div class="entry">
-                                <h2>Interface Font</h2>
-                                <select v-model="uiFontFamily" @change="updateSettings" class="ui-font-family">
-                                    <option value="">System font (default)</option>
-                                    <option
-                                        v-for="[font, label] in systemFonts.slice(1)"
-                                        :value="font"
-                                    >{{ label }}</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row font-settings">
-                            <div class="entry">
-                                <h2>Editor Font</h2>
-                                <select v-model="fontFamily" @change="updateSettings" class="font-family">
-                                    <option
-                                        v-for="[font, label] in systemFonts"
-                                        :selected="font === fontFamily"
-                                        :value="font"
-                                    >{{ label }}</option>
-                                </select>
-                            </div>
-                            <div class="entry">
-                                <h2>Font Size</h2>
-                                <select v-model="fontSize" @change="updateSettings" class="font-size">
-                                    <option
-                                        v-for="size in [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]"
-                                        :selected="size === fontSize"
-                                        :value="size"
-                                    >{{ size }}px{{ size === defaultFontSize ? " (default)" : "" }}</option>
-                                </select>
-                            </div>
-                            <div class="entry">
-                                <h2>Line Height</h2>
-                                <select v-model.number="lineHeight" @change="updateSettings" class="line-height">
-                                    <option :value="1.2">1.2</option>
-                                    <option :value="1.3">1.3 (compact)</option>
-                                    <option :value="1.4">1.4 (default)</option>
-                                    <option :value="1.5">1.5</option>
-                                    <option :value="1.6">1.6</option>
-                                    <option :value="1.8">1.8</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="entry">
-                                <h2>Cursor Blink Rate</h2>
-                                <select v-model.number="cursorBlinkRate" @change="updateSettings" class="cursor-blink-rate">
-                                    <option :value="0">Off</option>
-                                    <option :value="250">250 ms</option>
-                                    <option :value="500">500 ms</option>
-                                    <option :value="750">750 ms</option>
-                                    <option :value="1000">1000 ms (default)</option>
-                                    <option :value="1250">1250 ms</option>
-                                    <option :value="1500">1500 ms</option>
-                                    <option :value="2000">2000 ms</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="entry">
-                                <h2>Tabs</h2>
-                                <label>
-                                    <input 
-                                        type="checkbox" 
-                                        v-model="showTabs" 
-                                        @change="updateSettings"
-                                    />
-                                    Show tabs
-                                </label>
-                                
-                                <label>
-                                    <input 
-                                        type="checkbox" 
-                                        v-model="showTabsInFullscreen" 
-                                        @change="updateSettings"
-                                        :disabled="!showTabs"
-                                    />
-                                    Show tabs in fullscreen mode
+                                <label class="setting">
+                                    <span class="text">Line height</span>
+                                    <select v-model.number="lineHeight" @change="updateSettings" class="line-height">
+                                        <option :value="1.2">1.2</option>
+                                        <option :value="1.3">1.3 (compact)</option>
+                                        <option :value="1.4">1.4 (default)</option>
+                                        <option :value="1.5">1.5</option>
+                                        <option :value="1.6">1.6</option>
+                                        <option :value="1.8">1.8</option>
+                                    </select>
                                 </label>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="entry">
-                                <h2>Sidebar</h2>
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        v-model="showLeftPanel"
-                                        @change="updateSettings"
-                                    />
-                                    Show sidebar
+                        </section>
+                        <section>
+                            <h2>Editor</h2>
+                            <div class="card">
+                                <label class="setting">
+                                    <span class="text">Show line numbers</span>
+                                    <input type="checkbox" v-model="showLineNumberGutter" @change="updateSettings" />
+                                </label>
+                                <label class="setting">
+                                    <span class="text">Show fold gutter</span>
+                                    <input type="checkbox" v-model="showFoldGutter" @change="updateSettings" />
+                                </label>
+                                <label class="setting">
+                                    <span class="text">Show white-space</span>
+                                    <input type="checkbox" v-model="showWhitespace" @change="updateSettings" />
+                                </label>
+                                <label class="setting">
+                                    <span class="text">
+                                        Show color previews
+                                        <small>CSS, HTML, JavaScript, TypeScript, Vue and TSX blocks</small>
+                                    </span>
+                                    <input type="checkbox" v-model="colorPreviewEnabled" @change="updateSettings" />
+                                </label>
+                                <label class="setting">
+                                    <span class="text">Cursor blink rate</span>
+                                    <select v-model.number="cursorBlinkRate" @change="updateSettings" class="cursor-blink-rate">
+                                        <option :value="0">Off</option>
+                                        <option :value="250">250 ms</option>
+                                        <option :value="500">500 ms</option>
+                                        <option :value="750">750 ms</option>
+                                        <option :value="1000">1000 ms (default)</option>
+                                        <option :value="1250">1250 ms</option>
+                                        <option :value="1500">1500 ms</option>
+                                        <option :value="2000">2000 ms</option>
+                                    </select>
                                 </label>
                             </div>
-                        </div>
+                        </section>
+                        <section>
+                            <h2>Window</h2>
+                            <div class="card">
+                                <label class="setting">
+                                    <span class="text">Interface font</span>
+                                    <select v-model="uiFontFamily" @change="updateSettings" class="ui-font-family">
+                                        <option value="">System font (default)</option>
+                                        <option
+                                            v-for="[font, label] in systemFonts.slice(1)"
+                                            :value="font"
+                                        >{{ label }}</option>
+                                    </select>
+                                </label>
+                                <label class="setting">
+                                    <span class="text">Show sidebar</span>
+                                    <input type="checkbox" v-model="showLeftPanel" @change="updateSettings" />
+                                </label>
+                                <label class="setting">
+                                    <span class="text">Show tabs</span>
+                                    <input type="checkbox" v-model="showTabs" @change="updateSettings" />
+                                </label>
+                                <label class="setting">
+                                    <span class="text">Show tabs in fullscreen mode</span>
+                                    <input type="checkbox" v-model="showTabsInFullscreen" @change="updateSettings" :disabled="!showTabs" />
+                                </label>
+                            </div>
+                        </section>
                     </TabContent>
 
                     <TabContent tab="keyboard-bindings" :activeTab="activeTab">
-                        <div class="row">
-                            <div class="entry">
-                                <h2>Keymap</h2>
-                                <select v-model="keymap" @change="updateSettings" class="keymap">
-                                    <template v-for="km in keymaps" :key="km.value">
-                                        <option :selected="km.value === keymap" :value="km.value">{{ km.name }}</option>
-                                    </template>
-                                </select>
+                        <section>
+                            <div class="card">
+                                <label class="setting">
+                                    <span class="text">Keymap</span>
+                                    <select v-model="keymap" @change="updateSettings" class="keymap">
+                                        <template v-for="km in keymaps" :key="km.value">
+                                            <option :selected="km.value === keymap" :value="km.value">{{ km.name }}</option>
+                                        </template>
+                                    </select>
+                                </label>
+                                <label class="setting" v-if="keymap === 'emacs' && isMac">
+                                    <span class="text">Meta key</span>
+                                    <select v-model="metaKey" @change="updateSettings" class="metaKey">
+                                        <option :selected="metaKey === 'meta'" value="meta">Command</option>
+                                        <option :selected="metaKey === 'alt'" value="alt">Option</option>
+                                    </select>
+                                </label>
                             </div>
-                            <div class="entry" v-if="keymap === 'emacs' && isMac">
-                                <h2>Meta Key</h2>
-                                <select v-model="metaKey" @change="updateSettings" class="metaKey">
-                                    <option :selected="metaKey === 'meta'" value="meta">Command</option>
-                                    <option :selected="metaKey === 'alt'" value="alt">Option</option>
-                                </select>
-                            </div>
-                        </div>
-                        <KeyboardBindings 
+                        </section>
+                        <KeyboardBindings
                             :userKeys="keyBindings ? keyBindings : {}"
                             v-model="keyBindings"
                             @addKeyBindingDialogVisible="addKeyBindingDialogVisible = $event"
                         />
                     </TabContent>
-                    
-                    <TabContent tab="updates" :activeTab="activeTab">
-                        <div class="row">
-                            <div class="entry">
-                                <h2>Current Version</h2>
-                                <b>{{ appVersion }}</b>
-                            </div>
-                        </div>
 
-                        <div class="row" v-if="!isWebApp">
-                            <div class="entry">
-                                <h2>Auto Update</h2>
-                                <label>
-                                    <input 
-                                        type="checkbox" 
-                                        v-model="autoUpdate" 
-                                        @change="updateSettings"
-                                    />
-                                    Periodically check for new updates
+                    <TabContent tab="updates" :activeTab="activeTab">
+                        <section class="about">
+                            <img src="@/resources/icon.png" alt="" />
+                            <div>
+                                <div class="app-name">Heynote</div>
+                                <div class="version">Version {{ appVersion }}</div>
+                            </div>
+                        </section>
+                        <section v-if="!isWebApp">
+                            <div class="card">
+                                <label class="setting">
+                                    <span class="text">Periodically check for new updates</span>
+                                    <input type="checkbox" v-model="autoUpdate" @change="updateSettings" />
                                 </label>
-                                <label>
-                                    <input 
-                                        type="checkbox" 
-                                        v-model="autoInstallUpdates" 
-                                        @change="updateSettings"
-                                    />
-                                    Automatically install new updates
+                                <label class="setting">
+                                    <span class="text">Automatically install new updates</span>
+                                    <input type="checkbox" v-model="autoInstallUpdates" @change="updateSettings" />
+                                </label>
+                                <label class="setting">
+                                    <span class="text">
+                                        Use beta versions of Heynote
+                                        <small>Get new features early, with a few more rough edges</small>
+                                    </span>
+                                    <input type="checkbox" v-model="allowBetaVersions" @change="updateSettings" />
                                 </label>
                             </div>
-                        </div>
-                        <div class="row" v-if="!isWebApp">
-                            <div class="entry">
-                                <h2>Beta Versions</h2>
-                                <label>
-                                    <input 
-                                        type="checkbox" 
-                                        v-model="allowBetaVersions" 
-                                        @change="updateSettings"
-                                    />
-                                    Use beta versions of Heynote
-                                </label>
-                            </div>
-                        </div>
+                        </section>
                     </TabContent>
                 </div>
             </div>
-            
+
             <div class="bottom-bar" :inert="addKeyBindingDialogVisible">
-                <button 
+                <button
                     @click="$emit('closeSettings')"
                     class="close"
-                >Close</button>
+                >Done</button>
             </div>
         </div>
         <div class="shader"></div>
@@ -622,6 +553,10 @@
 </template>
 
 <style lang="sass" scoped>
+    // the theme thumbnails: a tiny window with a sidebar, an accent (selected) line and two lines of text
+    =theme-thumb($bg, $sidebar, $line)
+        background: linear-gradient(var(--accent), var(--accent)) 26px 11px / 26px 4px no-repeat, linear-gradient($line, $line) 26px 20px / 32px 3px no-repeat, linear-gradient($line, $line) 26px 28px / 22px 3px no-repeat, linear-gradient(to right, $sidebar 0 20px, $bg 20px)
+
     .settings
         z-index: 500 // above the search panel and other overlays
         position: fixed
@@ -641,8 +576,8 @@
             +shader-enter
 
         .dialog
-            --dialog-height: 600px
-            --bottom-bar-height: 48px
+            --dialog-height: 620px
+            --bottom-bar-height: 56px
             box-sizing: border-box
             z-index: 2
             position: absolute
@@ -652,98 +587,200 @@
             +dialog-enter
             width: 820px
             height: var(--dialog-height)
-            max-width: 100%
-            max-height: 100%
+            max-width: calc(100% - 32px)
+            max-height: calc(100% - 32px)
             display: flex
             flex-direction: column
             +rc-popover
-            overflow-y: auto
             &:active, &:selected, &:focus, &:focus-visible
                 outline: none
             .dialog-content
                 flex-grow: 1
                 display: flex
-                height: calc(var(--dialog-height) - var(--bottom-bar-height))
+                min-height: 0
+                // edge to edge, a shade off the content, like System Settings
                 .sidebar
                     box-sizing: border-box
-                    width: 140px
+                    flex-shrink: 0
+                    width: 196px
+                    padding: 16px 10px
+                    background: var(--fill-25)
                     border-right: 1px solid var(--border)
-                    padding-top: 20px
-                    h1
-                        font-size: 16px
-                        font-weight: 700
-                        margin-bottom: 20px
-                        padding: 0 20px
-                        margin-bottom: 20px
                 .settings-content
                     flex-grow: 1
-                    padding: 40px
+                    padding: 22px 32px 32px
                     overflow-y: auto
                     position: relative
+                    .pane-title
+                        font-size: 20px
+                        font-weight: 700
+                        letter-spacing: -0.01em
+                        margin-bottom: 20px
                     select
                         +rc-select
-                        margin: 2px 0
+                        width: 200px
                     // on/off settings are switches; the hotkey modifiers (KeyboardHotkey) stay checkboxes
                     input[type=checkbox]
                         +rc-switch
-                    .row
+                    section
+                        margin-bottom: 26px
+                        > h2
+                            font-size: 13px
+                            font-weight: 600
+                            color: var(--text-600)
+                            margin: 0 0 8px 2px
+                    // a grouped list: one rounded container, inset hairlines between rows
+                    .card
+                        border: 1px solid var(--border)
+                        border-radius: 10px
+                        background: var(--fill-25)
+                        overflow: hidden
+                    .setting
+                        position: relative
+                        box-sizing: border-box
                         display: flex
-                        .entry
-                            margin-bottom: 24px
-                            margin-right: 20px
-                            &:last-child
-                                margin-right: 0
-                            h2
-                                font-weight: 600
-                                margin-bottom: 10px
-                                font-size: 14px
-                            select
-                                width: 200px
-                                &:focus
-                                    outline: none
-                            label
-                                display: flex
-                                align-items: center
-                                gap: 10px
-                                min-height: 26px
-                                user-select: none
-                                &.keyboard-shortcut-label
-                                    margin-bottom: 10px
-                        &.font-settings
+                        align-items: center
+                        justify-content: space-between
+                        gap: 20px
+                        min-height: 46px
+                        padding: 9px 14px
+                        user-select: none
+                        & + .setting::before, .font-preview + &::before
+                            content: ""
+                            position: absolute
+                            top: 0
+                            left: 14px
+                            right: 14px
+                            height: 1px
+                            background: var(--border)
+                        .text
                             display: flex
-                            .font-family, .ui-font-family
-                                width: 280px
-                            .font-size, .line-height
-                                width: 120px
-                        
-                        .buffer-location 
-                            width: 100%
-                            .file-path
-                                display: flex
-                                margin-top: 6px
-                                > button
-                                    +rc-button
-                                    flex-shrink: 0
-                                .path
-                                    flex-grow: 1
-                                    margin-left: 10px
-                                    font-size: 12px
-                                    font-family: "Hack"
-                                    padding: 5px 8px
-                                    border-radius: 6px
-                                    background: var(--fill-50)
-                                    color: var(--text-600)
-                                    white-space: nowrap
-                                    overflow-x: auto
+                            flex-direction: column
+                            gap: 2px
+                            font-size: 13px
+                            small
+                                font-size: 11.5px
+                                color: var(--text-400)
+                        &:has(input:disabled)
+                            color: var(--text-400)
+                            input
+                                opacity: 1
+                        &.hotkey
+                            :deep(.keyboard-hotkey)
+                                flex-grow: 1
+                                padding: 0
+                                border: none
+                                background: none
+                    .font-family, .ui-font-family
+                        width: 240px
+                    .font-size, .line-height
+                        width: 140px
+                    .font-preview
+                        padding: 16px 18px
+                        border-bottom: 1px solid var(--border)
+                        background: var(--fill-25)
+                        color: var(--text)
+                        white-space: nowrap
+                        overflow: hidden
+                        text-overflow: ellipsis
+
+                    .theme-setting
+                        justify-content: center
+                        padding: 16px 14px 14px
+                    .theme-picker
+                        display: flex
+                        gap: 28px
+                        .theme-option
+                            display: flex
+                            flex-direction: column
+                            align-items: center
+                            gap: 7px
+                            font-size: 12px
+                            color: var(--text-600)
+                            cursor: pointer
+                            input
+                                position: absolute
+                                opacity: 0
+                                pointer-events: none
+                            .thumb
+                                width: 72px
+                                height: 46px
+                                border-radius: 7px
+                                box-shadow: 0 0 0 1px var(--border-200), 0 1px 3px rgb(0 0 0 / 0.15)
+                                outline: 2px solid transparent
+                                outline-offset: 2px
+                                transition: outline-color 150ms ease, scale 120ms var(--ease-out)
+                            &:active .thumb
+                                scale: 0.96
+                            &.light .thumb
+                                +theme-thumb(#fff, #e8e8ed, #d1d1d6)
+                            &.dark .thumb
+                                +theme-thumb(#1e1e20, #2c2c2f, #48484c)
+                            // half light, half dark
+                            &.system .thumb
+                                position: relative
+                                +theme-thumb(#fff, #e8e8ed, #d1d1d6)
+                                &::after
+                                    content: ""
+                                    position: absolute
+                                    inset: 0
+                                    border-radius: inherit
+                                    clip-path: inset(0 0 0 50%)
+                                    +theme-thumb(#1e1e20, #2c2c2f, #48484c)
+                            &:has(input:checked)
+                                color: var(--text)
+                                font-weight: 600
+                                .thumb
+                                    outline-color: var(--accent)
+                            &:has(input:focus-visible) .thumb
+                                outline-color: var(--text-400)
+                            @media (prefers-reduced-motion: reduce)
+                                &:active .thumb
+                                    scale: none
+
+                    .file-path
+                        .path
+                            min-width: 0
+                            font-size: 12px
+                            font-family: "Hack"
+                            color: var(--text-600)
+                            white-space: nowrap
+                            overflow: hidden
+                            text-overflow: ellipsis
+                            direction: rtl
+                            text-align: left
+                        > button
+                            +rc-button
+                            flex-shrink: 0
+
+                    .about
+                        display: flex
+                        align-items: center
+                        gap: 16px
+                        padding: 4px 2px
+                        img
+                            width: 64px
+                            height: 64px
+                        .app-name
+                            font-size: 17px
+                            font-weight: 700
+                        .version
+                            margin-top: 3px
+                            font-size: 12px
+                            color: var(--text-600)
+                            user-select: text
             .bottom-bar
                 box-sizing: border-box
+                flex-shrink: 0
+                display: flex
+                justify-content: flex-end
+                align-items: center
                 height: var(--bottom-bar-height)
                 border-top: 1px solid var(--border)
-                background: var(--fill-25)
-                text-align: right
-                padding: 10px 20px
+                padding: 0 20px
                 .close
                     +rc-button
                     +rc-button-primary
+                    min-width: 76px
                     padding: 0 16px
 </style>

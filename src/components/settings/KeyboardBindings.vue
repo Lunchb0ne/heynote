@@ -92,7 +92,7 @@
 <template>
     <div class="container">
         <div class="header" :inert="addKeyBinding">
-            <h2>Keyboard Bindings</h2>
+            <h2>Shortcuts</h2>
             <!--<p>User key bindings can be reordered. Bindings that appear first take precedence</p>-->
             <div class="button-container">
                 <button 
@@ -158,15 +158,19 @@
 <style lang="sass" scoped>
     .header
         display: flex
-        margin-bottom: 12px
+        align-items: flex-end
+        margin-bottom: 8px
         h2
             flex-grow: 1
             font-weight: 600
-            font-size: 14px
-            margin: 0
+            font-size: 13px
+            color: var(--text-600)
+            margin: 0 0 0 2px
         .button-container
             .add-keybinding
                 +rc-button
+                height: 24px
+                font-size: 12px
 
 
     // a grouped list: one rounded container, hairlines between rows
