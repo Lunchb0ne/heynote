@@ -605,7 +605,8 @@
             bottom: 0
             right: 0
             background: rgba(0, 0, 0, 0.5)
-        
+            +shader-enter
+
         .dialog
             --dialog-height: 600px
             --bottom-bar-height: 48px
@@ -615,6 +616,7 @@
             left: 50%
             top: 50%
             transform: translate(-50%, -50%)
+            +dialog-enter(translate(-50%, -50%))
             width: 820px
             height: var(--dialog-height)
             max-width: 100%

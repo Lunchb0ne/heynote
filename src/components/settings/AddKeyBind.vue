@@ -145,13 +145,15 @@
         background: rgba(255,255,255, 0.7)
         +dark-mode
             background: rgba(51,51,51, 0.7)
-        
+        +shader-enter
+
         .dialog
             width: 400px
             position: absolute
             top: 50%
             left: 50%
             transform: translate(-50%, -50%)
+            +dialog-enter(translate(-50%, -50%))
             display: flex
             flex-direction: column
             background: #fff
