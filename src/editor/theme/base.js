@@ -76,8 +76,68 @@ export const heynoteBase = EditorView.theme({
         backgroundColor: "rgb(255 197 49 / 0.6)",
         outline: "1px solid rgb(255 197 49)",
     },
+    // round, Reminders-style task checkbox: a hairline ring that fills with the text color, the
+    // check drawing in from the left (the widget keeps its element when toggled, see todo-checkbox.ts).
+    // Settings draws the same one with +rc-checkbox in include.sass
     ".cm-taskmarker-toggle input[type=checkbox]": {
-        accentColor: "var(--accent)",
+        appearance: "none",
+        // without the native look it has no size of its own (the monospace case sets the same inline)
+        width: "1.1em",
+        height: "1.1em",
+        borderRadius: "50%",
+        boxShadow: "inset 0 0 0 1.5px rgb(var(--text-rgb) / 0.3)",
+        cursor: "pointer",
+        transition: "transform 120ms var(--ease-out), background-color 150ms ease, box-shadow 150ms ease",
+    },
+    ".cm-taskmarker-toggle input[type=checkbox]::after": {
+        content: '""',
+        position: "absolute",
+        inset: "0",
+        backgroundColor: "rgb(var(--bg-rgb))",
+        mask: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M3.9 7.2l2.1 2.1 4.1-4.4' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 100% no-repeat`,
+        clipPath: "inset(0 100% 0 0)",
+        transition: "clip-path 220ms var(--ease-out)",
+    },
+    ".cm-taskmarker-toggle input[type=checkbox]:hover": {
+        boxShadow: "inset 0 0 0 1.5px rgb(var(--text-rgb) / 0.5)",
+        backgroundColor: "var(--fill-50)",
+    },
+    ".cm-taskmarker-toggle input[type=checkbox]:active": {
+        transform: "scale(0.88)",
+    },
+    ".cm-taskmarker-toggle input[type=checkbox]:checked": {
+        backgroundColor: "var(--text)",
+        boxShadow: "none",
+    },
+    ".cm-taskmarker-toggle input[type=checkbox]:checked::after": {
+        clipPath: "inset(0)",
+    },
+    // checking a task: the box overshoots and settles while the check draws in
+    ".cm-taskmarker-toggle input[type=checkbox].pop": {
+        animation: "heynote-task-pop 320ms var(--ease-out)",
+    },
+    "@keyframes heynote-task-pop": {
+        "0%": { transform: "scale(0.88)" },
+        "45%": { transform: "scale(1.15)" },
+        "100%": { transform: "scale(1)" },
+    },
+    // a done task dims and is struck through. The strike is a background so it can sweep across
+    // when the task is checked (.cm-task-just-done, see todo-checkbox.ts)
+    ".cm-task-done": {
+        color: "var(--text-400)",
+        background: "linear-gradient(var(--text-250), var(--text-250)) left 58% / 100% 1px no-repeat",
+    },
+    ".cm-task-done *": {
+        color: "inherit",
+    },
+    ".cm-task-just-done": {
+        animation: "heynote-task-strike 380ms var(--ease-out)",
+    },
+    "@keyframes heynote-task-strike": {
+        "from": { backgroundSize: "0% 1px", color: "var(--text)" },
+    },
+    "@keyframes heynote-task-fade": {
+        "from": { color: "var(--text)" },
     },
     ".cm-line": {
         padding: "0 6px",
@@ -192,10 +252,13 @@ export const heynoteBase = EditorView.theme({
     '&:not(.cm-focused) .heynote-focus-band': {
         opacity: 0.5,
     },
+    // one block for all of them: a second key with the same name would replace this one
     '@media (prefers-reduced-motion: reduce)': {
         '.heynote-focus-band.slide': {
             transition: 'opacity 200ms ease',
         },
+        '.cm-taskmarker-toggle input[type=checkbox].pop': { animation: 'none' },
+        '.cm-task-just-done': { animation: 'heynote-task-fade 200ms ease' },
     },
     '.heynote-math-result': {
         paddingLeft: "12px",

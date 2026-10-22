@@ -32,7 +32,8 @@ class CheckboxWidget extends WidgetType {
             wrap.appendChild(document.createTextNode("    "))
             wrap.style.position = "relative"
             box.style.position = "absolute"
-            box.style.top = "0"
+            // centered in the 1.4em line
+            box.style.top = "0.15em"
             box.style.left = "0.25em"
             box.style.width = "1.1em"
             box.style.height = "1.1em"
@@ -46,29 +47,64 @@ class CheckboxWidget extends WidgetType {
         return wrap
     }
 
+    // keep the element when toggled, so the check draws in and the box pops (see base.js)
+    updateDOM(dom: HTMLElement) {
+        const box = dom.querySelector("input")
+        if (!box || this.monospace !== (dom.firstChild?.nodeType === Node.TEXT_NODE)) {
+            return false
+        }
+        if (this.checked && !box.checked) {
+            box.classList.remove("pop")
+            void box.offsetWidth // restart the animation if it's still running
+            box.classList.add("pop")
+            box.addEventListener("animationend", () => box.classList.remove("pop"), { once: true })
+        }
+        box.checked = this.checked
+        return true
+    }
+
     ignoreEvent() { return false }
 }
 
 const checkboxRegex = /^([\t\f\v ]*-[\t\f\v ]*)\[( |x|X)\] /gm
 const checkboxLineRegex = /^([\t\f\v ]*-[\t\f\v ]*)\[( |x|X)\] /
 
-function checkboxes(view: EditorView) {
+const doneTask = Decoration.mark({ class: "cm-task-done" })
+// a task checked by this very update: its strike sweeps across (once, the class is gone on the next rebuild)
+const justDoneTask = Decoration.mark({ class: "cm-task-done cm-task-just-done" })
+
+// the checkbox widgets, and a mark dimming the text of each checked task. With the update that
+// caused the rebuild, tasks that were unchecked before it get justDoneTask.
+function checkboxes(view: EditorView, update?: ViewUpdate) {
     let widgets: any = []
+    let done: any = []
 
     for (let { from, to } of view.visibleRanges) {
         let range = view.state.sliceDoc(from, to)
         let match
         while (match = checkboxRegex.exec(range)) {
             if (getNoteBlockFromPos(view.state, from + match.index)?.language?.name === "markdown") {
+                const checked = match[2] === "x" || match[2] === "X"
                 let deco = Decoration.replace({
-                    widget: new CheckboxWidget(match[2] === "x" || match[2] === "X", view.state.facet(isMonospaceFont)),
+                    widget: new CheckboxWidget(checked, view.state.facet(isMonospaceFont)),
                     inclusive: false,
                 })
-                widgets.push(deco.range(from + match.index + match[1].length, from + match.index + match[0].length))
+                const boxFrom = from + match.index + match[1].length
+                const end = from + match.index + match[0].length
+                widgets.push(deco.range(boxFrom, end))
+                const lineEnd = view.state.doc.lineAt(end).to
+                if (checked && lineEnd > end) {
+                    let justDone = false
+                    if (update?.docChanged) {
+                        const before = update.changes.invertedDesc.mapPos(boxFrom, 1)
+                        justDone = update.startState.sliceDoc(before, before + 3) === "[ ]"
+                    }
+                    done.push((justDone ? justDoneTask : doneTask).range(end, lineEnd))
+                }
             }
         }
     }
-    return Decoration.set(widgets)
+    return { widgets: Decoration.set(widgets), done: Decoration.set(done) }
 }
 
 
@@ -202,22 +238,27 @@ export const toggleCheckbox = (view: EditorView) => {
 export const todoCheckboxPlugin = [
     ViewPlugin.fromClass(class {
         decorations: DecorationSet
+        done: DecorationSet
 
         constructor(view: EditorView) {
-            this.decorations = checkboxes(view)
+            ({ widgets: this.decorations, done: this.done } = checkboxes(view))
         }
 
         update(update: ViewUpdate) {
             if (update.docChanged || update.viewportChanged || transactionsHasAnnotation(update.transactions, SET_FONT)) {
-                this.decorations = checkboxes(update.view)
+                ({ widgets: this.decorations, done: this.done } = checkboxes(update.view, update))
             }
         }
     }, {
         decorations: v => v.decorations,
 
-        provide: plugin => EditorView.atomicRanges.of(view => {
-            return view.plugin(plugin)?.decorations || Decoration.none
-        }),
+        // only the widgets are atomic, not the done tasks' text
+        provide: plugin => [
+            EditorView.atomicRanges.of(view => {
+                return view.plugin(plugin)?.decorations || Decoration.none
+            }),
+            EditorView.decorations.of(view => view.plugin(plugin)?.done || Decoration.none),
+        ],
 
         eventHandlers: {
             mousedown: (e, view) => {
