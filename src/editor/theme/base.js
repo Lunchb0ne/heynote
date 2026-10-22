@@ -32,16 +32,39 @@ export const heynoteBase = EditorView.theme({
     "&.cm-focused .cm-nonmatchingBracket": {
         outline: "1px solid var(--accent)",
     },
+    // a quiet gutter: small tabular numbers 12px off the edge, that light up for the block holding
+    // the cursor and brighten fully on the cursor's line
     ".cm-gutters": {
         backgroundColor: "transparent",
-        color: "var(--text-250)",
+        color: "rgb(var(--text-rgb) / 0.18)",
         border: "none",
-        padding: '0 2px 0 4px',
+        padding: '0 0 0 12px',
         userSelect: 'none',
+    },
+    ".cm-gutterElement": {
+        transition: "color 150ms ease",
+    },
+    // the smaller numbers keep the code's line height (1.4 of the editor font) so they don't ride
+    // high, and drop to share the code's baseline
+    ".cm-lineNumbers .cm-gutterElement": {
+        padding: '0',
+        fontSize: '0.85em',
+        lineHeight: 'calc(1.4em / 0.85)',
+        position: 'relative',
+        top: '0.07em',
+        fontVariantNumeric: 'tabular-nums',
+    },
+    // without the fold gutter, keep the same air before the text
+    ".cm-lineNumbers:last-child .cm-gutterElement": {
+        paddingRight: '8px',
+    },
+    // line numbers of the block holding the cursor (same specificity as, and before, .cm-activeLineGutter)
+    ".heynote-active-block-gutter": {
+        color: "var(--text-600)",
     },
     ".cm-activeLineGutter": {
         backgroundColor: "transparent",
-        color: "var(--text-600)",
+        color: "var(--text)",
     },
     ".cm-foldPlaceholder": {
         backgroundColor: "transparent",
@@ -71,6 +94,31 @@ export const heynoteBase = EditorView.theme({
     },
     '.cm-foldGutter': {
         marginLeft: '0px',
+    },
+    // the chevron sits 6px off the numbers with the same 6px (the line padding) before the text, and
+    // takes the line number's color, so it lights up with its block
+    '.cm-foldGutter .cm-gutterElement': {
+        paddingLeft: '6px',
+        display: 'flex',
+        alignItems: 'center',
+    },
+    // square, so turning it stays inside the column (a taller box overflows and scrolls the column)
+    '.cm-gutters .cm-gutterElement .heynote-fold-marker': {
+        display: 'block',
+        width: '9px',
+        height: '9px',
+        cursor: 'pointer',
+        backgroundColor: 'currentColor',
+        // path centered in its box, so turning it for the folded state doesn't shift it
+        mask: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 9'%3E%3Cpath d='M2 3.25l2.5 2.5 2.5-2.5' fill='none' stroke='black' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 9px 9px no-repeat`,
+        transition: 'transform 200ms var(--ease-out), opacity 150ms ease, background-color 150ms ease',
+    },
+    '.cm-gutters .cm-gutterElement .heynote-fold-marker:hover': {
+        backgroundColor: 'var(--text)',
+    },
+    '.cm-gutters .cm-gutterElement .heynote-fold-marker.folded': {
+        transform: 'rotate(-90deg)',
+        backgroundColor: 'var(--text-600)',
     },
     '.cm-gutters .cm-gutterElement span': {
         opacity: 1,

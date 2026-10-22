@@ -92,6 +92,14 @@ export function foldGutterExtension() {
 
     return [
         foldGutter({
+            // one chevron, drawn and centered in CSS (base.js), turned when folded; the font's ⌄ and ›
+            // glyphs sit at different heights. The titles are what the hover-reveal CSS keys on.
+            markerDOM(open) {
+                const marker = document.createElement("span")
+                marker.className = "heynote-fold-marker" + (open ? "" : " folded")
+                marker.title = open ? "Fold line" : "Unfold line"
+                return marker
+            },
             domEventHandlers: {
                 click(view, line, event) {
                     // editor should not loose focus when clicking on the fold gutter
