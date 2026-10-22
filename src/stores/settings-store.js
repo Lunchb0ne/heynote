@@ -1,4 +1,4 @@
-import { toRaw, watch } from "vue"
+import { nextTick, toRaw, watch } from "vue"
 import { defineStore } from "pinia"
 
 import { SETTINGS_CHANGE_EVENT } from "@/src/common/constants"
@@ -55,7 +55,7 @@ export const useSettingsStore = defineStore("settings", {
                 this.theme = mode.computed
                 this.themeSetting = mode.theme
             })
-            const onThemeChange = (theme) => {
+            const applyTheme = (theme) => {
                 this.theme = theme
                 if (theme === "system") {
                     document.documentElement.setAttribute("theme", window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
@@ -63,7 +63,19 @@ export const useSettingsStore = defineStore("settings", {
                     document.documentElement.setAttribute("theme", theme)
                 }
             }
-            onThemeChange(window.heynote.themeMode.initial)
+            // crossfade the whole window (the default 250ms view transition) instead of snapping
+            // between light and dark; nextTick lets the editor swap its theme inside the transition
+            const onThemeChange = (theme) => {
+                if (!document.startViewTransition || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+                    applyTheme(theme)
+                    return
+                }
+                document.startViewTransition(() => {
+                    applyTheme(theme)
+                    return nextTick()
+                })
+            }
+            applyTheme(window.heynote.themeMode.initial)
             // vibrancy is macOS only (see registerTranslucentWindow in the main process)
             watch(() => this.settings.translucentWindow, (translucent) => {
                 document.documentElement.toggleAttribute("translucent", window.heynote.platform.isMac && translucent === true)

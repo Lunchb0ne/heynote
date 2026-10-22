@@ -209,6 +209,9 @@
         bottom: 0
         right: 0
         background: rgba(0,0,0, 0.2)
+        +shader-enter
+    // opened with the mouse (tab or sidebar context menu), so it fades in like Settings
     .new-note
         +rc-form-dialog
+        +dialog-enter
 </style>

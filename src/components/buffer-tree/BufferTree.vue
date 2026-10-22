@@ -779,6 +779,8 @@
                 color: var(--text)
         &.folder
             +disclosure-caret(calc(9px + var(--indent-level) * 20px))
+            // eases the drop highlight as a dragged buffer crosses folders
+            transition: background-color 120ms ease
             &:hover
                 background-color: var(--fill-50)
             &.drop-target

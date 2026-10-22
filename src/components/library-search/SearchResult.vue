@@ -265,7 +265,15 @@
                 font-size: 0.9em
                 vertical-align: middle
                 opacity: 0.65
-        .matches 
+        // the matches settle in under the caret as it turns; collapsing stays instant
+        .matches
+            transition: opacity 150ms ease, transform 150ms var(--ease-out)
+            @starting-style
+                opacity: 0
+                transform: translateY(-4px)
+            @media (prefers-reduced-motion: reduce)
+                @starting-style
+                    transform: none
             .match
                 cursor: pointer
                 display: flex

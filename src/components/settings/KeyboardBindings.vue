@@ -22,6 +22,8 @@
             return {
                 keymap: this.modelValue,
                 addKeyBinding: false,
+                // ms the other rows take to slide out of the way while one is dragged
+                dragAnimation: matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 180,
             }
         },
 
@@ -122,6 +124,8 @@
                 group="keymap" 
                 ghost-class="ghost"
                 handle=".drag-handle"
+                :animation="dragAnimation"
+                easing="var(--ease-out)"
                 @start="drag=true" 
                 @end="onDragEnd" 
                 item-key="key"

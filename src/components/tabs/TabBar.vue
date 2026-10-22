@@ -19,6 +19,8 @@
         data() {
             return {
                 isMac: window.heynote.platform.isMac,
+                // ms the other tabs take to slide out of the way while one is dragged
+                dragAnimation: matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 180,
             }
         },
 
@@ -82,7 +84,9 @@
                     tag="ol"
                     group="tabs" 
                     ghost-class="ghost"
-                    @end="dragEnd" 
+                    :animation="dragAnimation"
+                    easing="var(--ease-out)"
+                    @end="dragEnd"
                     item-key="path"
                 >
                     <template #item="{element, index}">

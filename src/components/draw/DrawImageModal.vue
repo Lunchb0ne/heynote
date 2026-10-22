@@ -750,8 +750,10 @@
             bottom: 0
             right: 0
             background: rgba(0, 0, 0, 0.5)
+            +shader-enter
 
         .dialog
+            +dialog-enter
             box-sizing: border-box
             z-index: 2
             position: absolute
